@@ -1,139 +1,153 @@
 <!DOCTYPE html>
-<!--activate jeykll-->
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Custom Keyboard Engine</title>
+  <title>OmniWord Engine Pro</title>
   <style>
     :root {
       --bg: #f3f2f1;
       --surface: #ffffff;
       --border: #dad9d8;
-      --key-bg: #f7f7f9;
-      --key-active: #e1dfdd;
-      --text: #323130;
+      --word-blue: #2b579a;
+      --key-bg: #ffffff;
+      --key-dark: #d1d5db;
     }
 
-    * { 
-      box-sizing: border-box; 
-      margin: 0; 
-      padding: 0; 
-      -webkit-tap-highlight-color: transparent;
-      user-select: none; /* Prevents text selection inside the keyboard interface */
-    }
-    
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      height: 100dvh;
-      display: flex;
-      flex-direction: column;
-      background: var(--bg);
-      color: var(--text);
-      overflow: hidden;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+    body { font-family: 'Segoe UI', system-ui, sans-serif; height: 100dvh; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
 
-    /* Fixed Workspace holding the document page */
-    .workspace {
-      flex: 1;
-      overflow-y: auto;
-      padding: 20px 12px;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .page {
+    /* Ultra-Feature Ribbon Deck */
+    .ribbon {
       background: var(--surface);
-      width: 100%;
-      max-width: 800px;
-      min-height: calc(100% - 10px);
-      padding: 24px 20px;
-      border-radius: 8px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.05);
-      outline: none;
-      line-height: 1.6;
-      font-size: 16px;
-      user-select: text; /* Re-enables text selection inside the actual document page */
-    }
-
-    /* Custom App-Native Software Keyboard Layout */
-    .keyboard-panel {
-      background: #eef1f5;
-      border-top: 1px solid var(--border);
-      padding: 8px 6px calc(8px + env(safe-area-inset-bottom)); /* Accounts for modern phone home bars */
+      border-bottom: 1px solid var(--border);
+      padding: 6px 12px;
       display: flex;
-      flex-direction: column;
+      flex-wrap: wrap;
       gap: 6px;
-      z-index: 1000;
-    }
-
-    .kbd-row {
-      display: flex;
-      justify-content: center;
-      width: 100%;
-      gap: 5px;
-    }
-
-    .key {
-      flex: 1;
-      height: 46px;
-      max-width: 42px;
-      background: var(--surface);
-      border: none;
-      border-radius: 5px;
-      font-size: 18px;
-      font-weight: 500;
-      color: #000;
-      display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 1px 1px rgba(0,0,0,0.2);
-      touch-action: manipulation;
+      z-index: 100;
     }
 
-    .key:active {
-      background: var(--key-active);
-      transform: scale(0.96);
-    }
-
-    /* Double/Wide Action Keys Layout mapping */
-    .key.wide { max-width: 65px; background: #d1d5db; font-size: 14px; }
-    .key.space { max-width: 260px; }
+    .tool-group { display: flex; align-items: center; gap: 4px; border-right: 1px solid var(--border); padding-right: 6px; }
     
-    /* Active State Tracker style for the Shift toggle modifier */
-    .key.active-mod { background: #0078d4; color: white; }
+    button, select {
+      padding: 6px 10px; border: 1px solid transparent; background: transparent;
+      border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;
+    }
+    button:hover, select:hover { background: #f3f2f1; }
+    select { border: 1px solid var(--border); background: var(--surface); font-size: 12px; }
+    
+    .color-picker-wrapper { display: flex; align-items: center; position: relative; }
+    .color-picker-wrapper input[type="color"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+
+    /* Master Document Canvas */
+    .workspace { flex: 1; overflow-y: auto; padding: 24px 12px; display: flex; flex-direction: column; align-items: center; }
+    .page {
+      background: var(--surface); width: 100%; max-width: 800px; min-height: 297mm;
+      padding: 25.4mm 20mm; box-shadow: 0 1px 6px rgba(0,0,0,0.06); outline: none;
+      line-height: 1.6; font-size: 11pt; user-select: text; word-wrap: break-word;
+    }
+
+    /* Core Document Elements Styling */
+    .page table { width: 100%; border-collapse: collapse; margin: 12px 0; }
+    .page td { border: 1px solid #a19f9d; padding: 8px; min-width: 40px; }
+    .page ul, .page ol { padding-left: 24px; margin-bottom: 12px; }
+
+    /* Modular Interface Keyboard Panel */
+    .keyboard-panel { background: #e3e6ec; border-top: 1px solid var(--border); padding: 6px; display: flex; flex-direction: column; gap: 5px; z-index: 1000; }
+    .kbd-row { display: flex; justify-content: center; width: 100%; gap: 4px; }
+    .key {
+      flex: 1; height: 44px; max-width: 40px; background: var(--key-bg); border: none;
+      border-radius: 5px; font-size: 16px; font-weight: 500; display: flex;
+      align-items: center; justify-content: center; box-shadow: 0 1px 1px rgba(0,0,0,0.15);
+      touch-action: none; /* Block default browser scroll-dragging artifacts */
+    }
+    .key:active { background: #cbd5e1; }
+    .key.wide { max-width: 60px; background: var(--key-dark); font-size: 13px; }
+    .key.space { max-width: 280px; }
+    .key.active-mod { background: var(--word-blue); color: white; }
+
+    @media (max-width: 768px) {
+      body { flex-direction: column-reverse; }
+      .ribbon { border-bottom: none; border-top: 1px solid var(--border); padding: 8px; justify-content: center; }
+      .workspace { padding: 8px; }
+      .page { padding: 16px; min-height: calc(100% - 4px); box-shadow: none; border-radius: 6px; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- Writable Canvas -->
+  <!-- Full-Suite Word Feature Deck -->
+  <header class="ribbon" id="desktopRibbon">
+    <div class="tool-group">
+      <select onchange="actions.exec('fontName', this.value)">
+        <option value="Segoe UI">Segoe UI</option>
+        <option value="Arial">Arial</option>
+        <option value="Times New Roman">Times New Roman</option>
+        <option value="Courier New">Courier New</option>
+      </select>
+      <select onchange="actions.exec('fontSize', this.value)">
+        <option value="3">12pt</option>
+        <option value="4">14pt</option>
+        <option value="5">18pt</option>
+        <option value="6">24pt</option>
+      </select>
+    </div>
+    <div class="tool-group">
+      <button onclick="actions.exec('bold')"><b>B</b></button>
+      <button onclick="actions.exec('italic')"><i>I</i></button>
+      <button onclick="actions.exec('underline')"><u>U</u></button>
+      <button onclick="actions.exec('strikeThrough')"><s>S</s></button>
+    </div>
+    <div class="tool-group">
+      <div class="color-picker-wrapper">
+        <button>🎨 Text</button>
+        <input type="color" onchange="actions.exec('foreColor', this.value)">
+      </div>
+      <div class="color-picker-wrapper">
+        <button>Highlight</button>
+        <input type="color" onchange="actions.exec('hiliteColor', this.value)" value="#ffff00">
+      </div>
+    </div>
+    <div class="tool-group">
+      <button onclick="actions.exec('justifyLeft')">Left</button>
+      <button onclick="actions.exec('justifyCenter')">Center</button>
+      <button onclick="actions.exec('justifyRight')">Right</button>
+      <button onclick="actions.exec('justifyFull')">Justify</button>
+    </div>
+    <div class="tool-group">
+      <button onclick="actions.exec('insertUnorderedList')">• List</button>
+      <button onclick="actions.exec('insertOrderedList')">1. List</button>
+    </div>
+    <div class="tool-group">
+      <button onclick="actions.insertTable()">+ Table</button>
+      <button onclick="actions.exec('removeFormat')">Clear Style</button>
+    </div>
+  </header>
+
+  <!-- Interactive Document Workspace -->
   <main class="workspace">
-    <!-- inputmode="none" stops the mobile browser's default keyboard from triggering -->
     <div class="page" id="editor" contenteditable="true" inputmode="none">
-      <p>Tap here to type using the native custom software keyboard below...</p>
+      <h1>OmniWord Workspace Terminal</h1>
+      <p>This deployment contains structural configuration loops that execute directly on client hardware channels...</p>
     </div>
   </main>
 
-  <!-- Native Keyboard UI Component Map -->
+  <!-- Custom Input Peripheral Board -->
   <footer class="keyboard-panel" id="keyboard">
-    <!-- Row 1 -->
     <div class="kbd-row">
       <button class="key">q</button><button class="key">w</button><button class="key">e</button><button class="key">r</button><button class="key">t</button><button class="key">y</button><button class="key">u</button><button class="key">i</button><button class="key">o</button><button class="key">p</button>
     </div>
-    <!-- Row 2 -->
     <div class="kbd-row">
       <button class="key">a</button><button class="key">s</button><button class="key">d</button><button class="key">f</button><button class="key">g</button><button class="key">h</button><button class="key">j</button><button class="key">k</button><button class="key">l</button>
     </div>
-    <!-- Row 3 -->
     <div class="kbd-row">
-      <button class="key wide" id="shift-btn">Shift</button>
+      <button class="key wide" id="shiftBtn">Shift</button>
       <button class="key">z</button><button class="key">x</button><button class="key">c</button><button class="key">v</button><button class="key">b</button><button class="key">n</button><button class="key">m</button>
-      <button class="key wide" data-action="backspace">⌫</button>
+      <button class="key wide" id="backspaceBtn">⌫</button>
     </div>
-    <!-- Row 4 -->
     <div class="kbd-row">
-      <button class="key wide" data-action="bold"><b>B</b></button>
       <button class="key space" data-value=" ">Space</button>
       <button class="key wide" data-action="enter">↵</button>
     </div>
@@ -142,12 +156,27 @@
   <script>
     const editor = document.getElementById('editor');
     const keyboard = document.getElementById('keyboard');
-    const shiftBtn = document.getElementById('shift-btn');
+    const shiftBtn = document.getElementById('shiftBtn');
+    const backspaceBtn = document.getElementById('backspaceBtn');
     
     let isShifted = false;
     let savedRange = null;
+    let backspaceLoopId = null;
 
-    // Track selection changes to remember where the user was looking/editing
+    // Direct Action Pipeline mapping commands directly to native C++ layout systems
+    const actions = {
+      exec(command, value = null) {
+        restoreSelection();
+        document.execCommand(command, false, value);
+      },
+      insertTable() {
+        restoreSelection();
+        const tableStructure = `<table><tr><td></td><td></td></tr><tr><td></td><td></td></tr></table><p></p>`;
+        document.execCommand('insertHTML', false, tableStructure);
+      }
+    };
+
+    // Tracking text cursor changes
     document.addEventListener('selectionchange', () => {
       const selection = window.getSelection();
       if (selection.rangeCount > 0 && editor.contains(selection.getRangeAt(0).commonAncestorContainer)) {
@@ -155,8 +184,7 @@
       }
     });
 
-    // Capture and restore selection focus cleanly
-    function restoreFocus() {
+    function restoreSelection() {
       editor.focus();
       const selection = window.getSelection();
       if (savedRange) {
@@ -165,21 +193,53 @@
       }
     }
 
-    // High-Performance Core Keyboard Input Listener Interface (Event Delegation)
-    keyboard.addEventListener('pointerdown', (e) => {
-      e.preventDefault(); // Crucial: prevents text selection blur event focus drop
+    // --- HARDCORE FIX: CONTINUOUS AUTO-REPEATING BACKSPACE MODULE ---
+    function executeDeletionStep() {
+      restoreSelection();
+      const selection = window.getSelection();
+      if (!selection.rangeCount) return;
+      const range = selection.getRangeAt(0);
+
+      if (range.collapsed) {
+        // If cursor is just blinking, expand range backwards by 1 text coordinate point
+        range.setStart(range.startContainer, Math.max(0, range.startOffset - 1));
+      }
+      range.deleteContents();
+    }
+
+    function startBackspaceLoop() {
+      if (backspaceLoopId) return;
+      executeDeletionStep(); // Fire instantly on initial strike
       
+      // Keep repeating deletions at intervals while pointer is held down
+      backspaceLoopId = setInterval(executeDeletionStep, 80); 
+    }
+
+    function stopBackspaceLoop() {
+      if (backspaceLoopId) {
+        clearInterval(backspaceLoopId);
+        backspaceLoopId = null;
+      }
+    }
+
+    // Bind non-delayed physical pointers to manage input states perfectly
+    backspaceBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); startBackspaceLoop(); });
+    backspaceBtn.addEventListener('pointerup', (e) => { e.preventDefault(); stopBackspaceLoop(); });
+    backspaceBtn.addEventListener('pointerleave', (e) => { e.preventDefault(); stopBackspaceLoop(); });
+
+    // --- GENERAL INPUT ROUTING ENGINE ---
+    keyboard.addEventListener('pointerdown', (e) => {
       const target = e.target.closest('button');
-      if (!target) return;
+      if (!target || target === backspaceBtn) return; // Backspace is isolated above
+      e.preventDefault();
 
-      restoreFocus();
+      restoreSelection();
 
-      // 1. Shift Key Processing Toggle
-      if (target.id === 'shift-btn') {
+      if (target === shiftBtn) {
         isShifted = !isShifted;
         shiftBtn.classList.toggle('active-mod', isShifted);
-        document.querySelectorAll('.key:not(.wide)').forEach(key => {
-          key.textContent = isShifted ? key.textContent.toUpperCase() : key.textContent.toLowerCase();
+        document.querySelectorAll('.key:not(.wide):not(.space)').forEach(k => {
+          k.textContent = isShifted ? k.textContent.toUpperCase() : k.textContent.toLowerCase();
         });
         return;
       }
@@ -188,52 +248,31 @@
       if (!selection.rangeCount) return;
       const range = selection.getRangeAt(0);
 
-      // 2. Structural Action Processing Engine
-      if (target.dataset.action) {
-        const action = target.dataset.action;
-        
-        if (action === 'backspace') {
-          if (range.collapsed) {
-            // Move cursor back one character to remove it natively if no range text selection exists
-            range.setStart(range.startContainer, Math.max(0, range.startOffset - 1));
-          }
-          range.deleteContents();
-        } 
-        else if (action === 'enter') {
-          // Injects clean block elements natively at the precise cursor placement node
-          const br = document.createElement('br');
-          range.insertNode(br);
-          range.setStartAfter(br);
-          range.setEndAfter(br);
-          selection.removeAllRanges();
-          selection.addRange(range);
-        }
-        else if (action === 'bold') {
-          document.execCommand('bold', false, null);
-        }
+      if (target.dataset.action === 'enter') {
+        const brNode = document.createElement('br');
+        range.insertNode(brNode);
+        range.setStartAfter(brNode);
+        range.setEndAfter(brNode);
+        selection.removeAllRanges();
+        selection.addRange(range);
         return;
       }
 
-      // 3. Simple Text Injection Matrix Flow
-      const value = target.dataset.value !== undefined ? target.dataset.value : target.textContent;
+      // Input insertion execution step
+      const val = target.dataset.value !== undefined ? target.dataset.value : target.textContent;
       range.deleteContents();
+      const node = document.createTextNode(val);
+      range.insertNode(node);
       
-      const textNode = document.createTextNode(value);
-      range.insertNode(textNode);
-      
-      // Move insertion coordinate directly past the text node entry
-      range.setStartAfter(textNode);
-      range.setEndAfter(textNode);
+      range.setStartAfter(node);
+      range.setEndAfter(node);
       selection.removeAllRanges();
       selection.addRange(range);
 
-      // Reset shift key state after inserting a character
       if (isShifted) {
         isShifted = false;
         shiftBtn.classList.remove('active-mod');
-        document.querySelectorAll('.key:not(.wide)').forEach(key => {
-          key.textContent = key.textContent.toLowerCase();
-        });
+        document.querySelectorAll('.key:not(.wide):not(.space)').forEach(k => k.textContent = k.textContent.toLowerCase());
       }
     });
   </script>
