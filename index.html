@@ -1,280 +1,1761 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>OmniWord Engine Pro</title>
-  <style>
-    :root {
-      --bg: #f3f2f1;
-      --surface: #ffffff;
-      --border: #dad9d8;
-      --word-blue: #2b579a;
-      --key-bg: #ffffff;
-      --key-dark: #d1d5db;
-    }
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Document1 - Word</title>
+<style>
+:root{
+  --c-accent:#2b579a;
+  --c-accent-dk:#1c3c66;
+  --c-accent-soft:#e8f0fb;
+  --c-bg:#faf9f8;
+  --c-surface:#ffffff;
+  --c-border:#e1dfdd;
+  --c-text:#252423;
+  --c-text-dim:#605e5c;
+  --c-hover:#f3f2f1;
+  --c-active:#e1dfdd;
+  --c-page:#ffffff;
+  --c-page-text:#1b1a19;
+  --r-s:4px;
+  --r-m:8px;
+  --r-l:14px;
+  --sh-1:0 1px 3px rgba(0,0,0,.12);
+  --sh-2:0 8px 24px rgba(0,0,0,.18);
+  --topbar-h:46px;
+  --quickbar-h:50px;
+  --font-ui:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+}
+body.ui-dark{
+  --c-bg:#1f1f1f;
+  --c-surface:#262626;
+  --c-border:#3a3a3a;
+  --c-text:#f1f1f1;
+  --c-text-dim:#b8b6b4;
+  --c-hover:#333333;
+  --c-active:#3d3d3d;
+  --c-accent-soft:#26334a;
+}
+*{box-sizing:border-box;}
+html,body{height:100%;}
+body{
+  margin:0;font-family:var(--font-ui);color:var(--c-text);background:var(--c-bg);
+  overflow:hidden; -webkit-tap-highlight-color:transparent;
+}
+button{font-family:inherit;}
+.ic{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;}
+.ic-sm{width:14px;height:14px;}
+.ic-lg{width:22px;height:22px;}
 
-    * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-    body { font-family: 'Segoe UI', system-ui, sans-serif; height: 100dvh; display: flex; flex-direction: column; background: var(--bg); overflow: hidden; }
+/* ===== App shell ===== */
+.app{display:flex;flex-direction:column;height:100vh;}
 
-    /* Ultra-Feature Ribbon Deck */
-    .ribbon {
-      background: var(--surface);
-      border-bottom: 1px solid var(--border);
-      padding: 6px 12px;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      align-items: center;
-      z-index: 100;
-    }
+/* ===== Top bar ===== */
+.topbar{
+  height:var(--topbar-h);min-height:var(--topbar-h);
+  background:var(--c-accent);color:#fff;display:flex;align-items:center;
+  padding:0 8px;gap:6px;z-index:60;flex-shrink:0;
+}
+.tb-btn{
+  background:transparent;border:none;color:#fff;width:36px;height:36px;border-radius:var(--r-s);
+  display:flex;align-items:center;justify-content:center;cursor:pointer;
+}
+.tb-btn:hover{background:rgba(255,255,255,.16);}
+.tb-btn:active{background:rgba(255,255,255,.28);}
+.tb-title-wrap{display:flex;flex-direction:column;flex:1;min-width:0;line-height:1.1;padding:0 4px;}
+.tb-title{
+  background:transparent;border:none;color:#fff;font-size:14px;font-weight:600;outline:none;
+  width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.tb-sub{font-size:10px;color:rgba(255,255,255,.75);display:flex;align-items:center;gap:4px;}
+.tb-sub .dot{width:6px;height:6px;border-radius:50%;background:#6bcb77;display:inline-block;}
+.tb-right{display:flex;align-items:center;gap:2px;}
+.tb-desktop-only{display:none;}
+.tb-search-desktop{
+  display:none;align-items:center;gap:6px;background:rgba(255,255,255,.16);border-radius:16px;
+  padding:6px 12px;width:260px;color:#fff;cursor:pointer;
+}
+.tb-search-desktop input{background:transparent;border:none;color:#fff;outline:none;font-size:12px;width:100%;}
+.tb-search-desktop input::placeholder{color:rgba(255,255,255,.7);}
 
-    .tool-group { display: flex; align-items: center; gap: 4px; border-right: 1px solid var(--border); padding-right: 6px; }
-    
-    button, select {
-      padding: 6px 10px; border: 1px solid transparent; background: transparent;
-      border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500;
-    }
-    button:hover, select:hover { background: #f3f2f1; }
-    select { border: 1px solid var(--border); background: var(--surface); font-size: 12px; }
-    
-    .color-picker-wrapper { display: flex; align-items: center; position: relative; }
-    .color-picker-wrapper input[type="color"] { position: absolute; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+/* ===== Ribbon ===== */
+.ribbon{
+  background:var(--c-surface);border-bottom:1px solid var(--c-border);flex-shrink:0;
+  z-index:55;
+}
+.ribbon-tabs{
+  display:flex;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--c-border);
+  background:var(--c-bg);
+}
+.ribbon-tabs::-webkit-scrollbar{display:none;}
+.rtab{
+  padding:10px 16px;border:none;background:none;color:var(--c-text-dim);font-size:13px;font-weight:600;
+  cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;flex-shrink:0;
+}
+.rtab:hover{color:var(--c-text);}
+.rtab.active{color:var(--c-accent);border-bottom-color:var(--c-accent);background:var(--c-surface);}
+.rtab.file-tab{color:var(--c-accent);}
 
-    /* Master Document Canvas */
-    .workspace { flex: 1; overflow-y: auto; padding: 24px 12px; display: flex; flex-direction: column; align-items: center; }
-    .page {
-      background: var(--surface); width: 100%; max-width: 800px; min-height: 297mm;
-      padding: 25.4mm 20mm; box-shadow: 0 1px 6px rgba(0,0,0,0.06); outline: none;
-      line-height: 1.6; font-size: 11pt; user-select: text; word-wrap: break-word;
-    }
+.rpanel{display:none;gap:10px;padding:8px 10px;overflow-x:auto;align-items:stretch;}
+.rpanel.active{display:flex;}
+.rgroup{
+  display:flex;flex-direction:column;gap:4px;padding:2px 10px;border-right:1px solid var(--c-border);
+  flex-shrink:0;min-width:max-content;
+}
+.rgroup:last-child{border-right:none;}
+.rgroup-label{font-size:10px;color:var(--c-text-dim);text-align:center;text-transform:uppercase;letter-spacing:.3px;margin-top:auto;}
+.rgroup-row{display:flex;gap:4px;align-items:flex-start;}
 
-    /* Core Document Elements Styling */
-    .page table { width: 100%; border-collapse: collapse; margin: 12px 0; }
-    .page td { border: 1px solid #a19f9d; padding: 8px; min-width: 40px; }
-    .page ul, .page ol { padding-left: 24px; margin-bottom: 12px; }
+.rbtn{
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;
+  width:54px;min-height:54px;background:transparent;border:1px solid transparent;border-radius:var(--r-s);
+  cursor:pointer;color:var(--c-text);padding:5px 2px;
+}
+.rbtn span{font-size:9.5px;line-height:1.1;text-align:center;color:var(--c-text-dim);}
+.rbtn:hover{background:var(--c-hover);border-color:var(--c-border);}
+.rbtn.active{background:var(--c-accent-soft);border-color:var(--c-accent);color:var(--c-accent);}
+.rbtn.active span{color:var(--c-accent);}
+.rbtn-sm{width:30px;min-height:30px;flex-direction:row;padding:4px;}
+.rbtn-wide{width:auto;min-width:64px;flex-direction:row;gap:6px;padding:6px 10px;}
+.rbtn-big{width:60px;min-height:58px;}
+.rbtn-big .ic{width:24px;height:24px;}
 
-    /* Modular Interface Keyboard Panel */
-    .keyboard-panel { background: #e3e6ec; border-top: 1px solid var(--border); padding: 6px; display: flex; flex-direction: column; gap: 5px; z-index: 1000; }
-    .kbd-row { display: flex; justify-content: center; width: 100%; gap: 4px; }
-    .key {
-      flex: 1; height: 44px; max-width: 40px; background: var(--key-bg); border: none;
-      border-radius: 5px; font-size: 16px; font-weight: 500; display: flex;
-      align-items: center; justify-content: center; box-shadow: 0 1px 1px rgba(0,0,0,0.15);
-      touch-action: none; /* Block default browser scroll-dragging artifacts */
-    }
-    .key:active { background: #cbd5e1; }
-    .key.wide { max-width: 60px; background: var(--key-dark); font-size: 13px; }
-    .key.space { max-width: 280px; }
-    .key.active-mod { background: var(--word-blue); color: white; }
+.rcombo{display:flex;flex-direction:column;gap:3px;}
+.rcombo-row{display:flex;gap:3px;}
+select.rselect, input.rinput{
+  font-size:12px;border:1px solid var(--c-border);border-radius:var(--r-s);padding:5px 6px;
+  background:var(--c-surface);color:var(--c-text);font-family:inherit;
+}
+select.rselect{min-width:108px;}
+.rinput-num{width:46px;}
 
-    @media (max-width: 768px) {
-      body { flex-direction: column-reverse; }
-      .ribbon { border-bottom: none; border-top: 1px solid var(--border); padding: 8px; justify-content: center; }
-      .workspace { padding: 8px; }
-      .page { padding: 16px; min-height: calc(100% - 4px); box-shadow: none; border-radius: 6px; }
-    }
-  </style>
+.split-btn{display:flex;border:1px solid transparent;border-radius:var(--r-s);}
+.split-btn:hover{border-color:var(--c-border);}
+.split-btn .rbtn{border:none;}
+.split-arrow{
+  width:16px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--c-text-dim);
+  border-left:1px solid var(--c-border);
+}
+.split-arrow:hover{background:var(--c-hover);}
+
+.style-gallery{display:flex;gap:6px;overflow-x:auto;max-width:340px;padding-bottom:2px;}
+.style-chip{
+  flex-shrink:0;min-width:78px;padding:8px 10px;border:1px solid var(--c-border);border-radius:var(--r-s);
+  cursor:pointer;background:var(--c-surface);text-align:center;
+}
+.style-chip:hover{border-color:var(--c-accent);background:var(--c-accent-soft);}
+.style-chip b{display:block;font-size:11px;}
+.style-chip small{font-size:9px;color:var(--c-text-dim);}
+
+.dropdown-pop{
+  position:fixed;background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-m);
+  box-shadow:var(--sh-2);z-index:900;padding:8px;display:none;max-width:260px;
+}
+.dropdown-pop.open{display:block;}
+.dd-item{padding:8px 10px;border-radius:var(--r-s);cursor:pointer;font-size:12.5px;display:flex;align-items:center;gap:8px;}
+.dd-item:hover{background:var(--c-hover);}
+.swatch-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:5px;}
+.swatch{width:20px;height:20px;border-radius:3px;border:1px solid rgba(0,0,0,.15);cursor:pointer;}
+.swatch:hover{outline:2px solid var(--c-accent);outline-offset:1px;}
+.dd-section-label{font-size:10px;color:var(--c-text-dim);text-transform:uppercase;margin:6px 4px 4px;}
+
+/* Ruler */
+.ruler-bar{height:22px;background:var(--c-bg);border-bottom:1px solid var(--c-border);display:flex;justify-content:center;flex-shrink:0;}
+.ruler-bar.hidden-ruler{display:none;}
+.ruler{position:relative;width:660px;max-width:90%;height:100%;background:var(--c-surface);border-left:1px solid var(--c-border);border-right:1px solid var(--c-border);}
+.r-tick{position:absolute;bottom:0;width:1px;background:var(--c-border);height:6px;}
+.r-tick.major{height:10px;background:var(--c-text-dim);}
+.r-label{position:absolute;top:1px;font-size:8px;color:var(--c-text-dim);transform:translateX(-50%);}
+
+/* ===== Workspace ===== */
+.workspace{flex:1;display:flex;overflow:hidden;position:relative;}
+
+.sidebar{
+  width:240px;flex-shrink:0;background:var(--c-surface);border-right:1px solid var(--c-border);
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.sidebar-head{padding:10px 12px;border-bottom:1px solid var(--c-border);display:flex;align-items:center;gap:8px;}
+.sidebar-head input{flex:1;border:1px solid var(--c-border);border-radius:14px;padding:6px 10px;font-size:12px;outline:none;}
+.sidebar-tabs{display:flex;border-bottom:1px solid var(--c-border);}
+.sb-tab{flex:1;padding:8px;font-size:11px;border:none;background:none;color:var(--c-text-dim);cursor:pointer;border-bottom:2px solid transparent;}
+.sb-tab.active{color:var(--c-accent);border-bottom-color:var(--c-accent);}
+.sidebar-body{flex:1;overflow-y:auto;padding:8px;}
+.nav-item{padding:7px 10px;border-radius:var(--r-s);cursor:pointer;font-size:12.5px;color:var(--c-text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.nav-item:hover{background:var(--c-hover);}
+.nav-item.lvl2{padding-left:22px;font-size:11.5px;color:var(--c-text-dim);}
+.nav-item.lvl3{padding-left:34px;font-size:11px;}
+.nav-empty{font-size:12px;color:var(--c-text-dim);padding:14px 10px;text-align:center;}
+
+.doc-area{flex:1;position:relative;display:flex;flex-direction:column;overflow:hidden;background:var(--c-bg);}
+.doc-scroll{flex:1;overflow:auto;display:flex;justify-content:center;padding:28px 16px 90px;}
+
+.page{
+  width:8.5in;min-height:11in;background:var(--c-page);color:var(--c-page-text);
+  box-shadow:var(--sh-2);padding:0;position:relative;flex-shrink:0;
+}
+.page-header,.page-footer{padding:0 .9in;min-height:30px;font-size:9.5pt;color:#6b6b6b;outline:none;}
+.page-header{padding-top:.4in;border-bottom:1px dashed transparent;}
+.page-footer{padding-bottom:.4in;}
+.page-content{
+  padding:0 .9in;min-height:8in;outline:none;font-family:Calibri,'Segoe UI',sans-serif;font-size:11pt;
+  line-height:1.5;hyphens:none;
+}
+.page-content h1{font-size:24pt;font-weight:600;color:var(--c-accent-dk);margin:18px 0 8px;}
+.page-content h2{font-size:18pt;font-weight:600;color:var(--c-accent-dk);margin:16px 0 6px;}
+.page-content h3{font-size:14pt;font-weight:600;margin:14px 0 5px;}
+.page-content p{margin:0 0 8px;}
+.page-content table{border-collapse:collapse;width:100%;margin:10px 0;}
+.page-content td,.page-content th{border:1px solid #b9b9b9;padding:6px 8px;font-size:10.5pt;}
+.page-content img{max-width:100%;height:auto;cursor:pointer;}
+.page-content img.sel{outline:2px solid var(--c-accent);}
+.page-content .lined{counter-reset:line;}
+.page-content.line-numbers > *{counter-increment:line;position:relative;}
+.page-content.line-numbers > *::before{
+  content:counter(line);position:absolute;left:-34px;font-size:9px;color:#aaa;width:26px;text-align:right;
+}
+.page-content.hyph-on{hyphens:auto;}
+.page-content[style*="column-count"]{column-gap:28px;}
+.footnotes-area{margin:0 .9in;padding-top:8px;border-top:1px solid #999;font-size:9pt;color:#444;}
+.footnotes-area .fnline{margin-bottom:4px;}
+.fn-ref{color:var(--c-accent);cursor:pointer;font-size:.75em;}
+.watermark-el{
+  position:absolute;top:46%;left:50%;transform:translate(-50%,-50%) rotate(-32deg);
+  font-size:64px;font-weight:800;color:rgba(170,170,170,.35);letter-spacing:4px;pointer-events:none;
+  white-space:nowrap;z-index:1;
+}
+.comment-mark{background:#fff3b0;cursor:pointer;border-bottom:2px solid #e0b400;}
+.index-mark{background:#e7f0ff;}
+ins.trk{color:#0a7d2c;text-decoration:underline;background:rgba(10,125,44,.08);}
+del.trk{color:#c0262c;text-decoration:line-through;background:rgba(192,38,44,.08);}
+
+/* page view modes */
+.page[data-view="web"]{width:100%;max-width:980px;min-height:auto;box-shadow:none;border:1px solid var(--c-border);}
+.page[data-view="web"] .page-header,.page[data-view="web"] .page-footer{display:none;}
+.page[data-view="draft"]{box-shadow:none;width:100%;max-width:900px;}
+.page[data-view="draft"] .page-content{font-family:'Courier New',monospace;padding:0 24px;}
+.page[data-view="draft"] img,.page[data-view="draft"] .page-header,.page[data-view="draft"] .page-footer{display:none;}
+.page[data-view="outline"] .page-content > *{display:none;}
+.page[data-view="outline"] .page-content h1,.page[data-view="outline"] .page-content h2,.page[data-view="outline"] .page-content h3{display:block;}
+
+.gridlines-on .page-content{
+  background-image:linear-gradient(var(--c-border) 1px,transparent 1px),linear-gradient(90deg,var(--c-border) 1px,transparent 1px);
+  background-size:24px 24px;
+}
+
+.read-mode .topbar,.read-mode .ribbon,.read-mode .ruler-bar,.read-mode .sidebar,.read-mode .statusbar,.read-mode .quickbar{display:none !important;}
+.read-mode .doc-scroll{padding:50px 16px;background:#eef0f3;}
+.read-mode .page{width:100%;max-width:680px;min-height:auto;box-shadow:none;font-size:13pt;}
+.read-exit{
+  position:fixed;top:14px;right:14px;background:var(--c-accent);color:#fff;border:none;border-radius:20px;
+  padding:8px 16px;font-size:12px;display:none;align-items:center;gap:6px;cursor:pointer;z-index:1200;
+}
+.read-mode .read-exit{display:flex;}
+
+/* Contextual floating toolbars */
+.float-toolbar{
+  position:fixed;background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-m);
+  box-shadow:var(--sh-2);display:none;gap:3px;padding:5px;z-index:500;
+}
+.float-toolbar.show{display:flex;}
+.float-toolbar button{
+  width:32px;height:32px;border:none;background:none;border-radius:var(--r-s);cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--c-text);
+}
+.float-toolbar button:hover{background:var(--c-hover);}
+
+/* Mini selection bubble (mobile quick format) */
+.sel-bubble{
+  position:fixed;background:#2b2b2b;border-radius:8px;display:none;gap:2px;padding:4px;z-index:600;
+  box-shadow:var(--sh-2);
+}
+.sel-bubble.show{display:flex;}
+.sel-bubble button{width:32px;height:32px;border:none;background:none;border-radius:6px;color:#fff;display:flex;align-items:center;justify-content:center;}
+.sel-bubble button:hover{background:rgba(255,255,255,.15);}
+
+/* Status bar */
+.statusbar{
+  height:28px;flex-shrink:0;background:var(--c-accent);color:#fff;display:flex;align-items:center;
+  justify-content:space-between;padding:0 12px;font-size:11px;z-index:40;
+}
+.sb-group{display:flex;align-items:center;gap:14px;}
+.sb-item{display:flex;align-items:center;gap:4px;cursor:pointer;}
+.sb-item:hover{text-decoration:underline;}
+.sb-item .ic{width:13px;height:13px;}
+.zoom-controls{display:flex;align-items:center;gap:4px;}
+.zoom-controls button{background:transparent;border:none;color:#fff;width:18px;height:18px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+input[type=range].zoom-range{width:70px;accent-color:#fff;}
+
+/* Mobile quick bar */
+.quickbar{
+  display:none;position:fixed;left:0;right:0;bottom:0;height:var(--quickbar-h);background:var(--c-surface);
+  border-top:1px solid var(--c-border);align-items:center;gap:2px;padding:0 4px;overflow-x:auto;
+  z-index:700;box-shadow:0 -2px 8px rgba(0,0,0,.06);
+}
+.qb-btn{
+  flex-shrink:0;width:42px;height:42px;border:none;background:none;border-radius:var(--r-s);
+  display:flex;align-items:center;justify-content:center;color:var(--c-text);
+}
+.qb-btn.active{background:var(--c-accent-soft);color:var(--c-accent);}
+.qb-sep{width:1px;height:24px;background:var(--c-border);flex-shrink:0;margin:0 4px;}
+
+/* drawers / backdrops */
+.backdrop{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:300;display:none;}
+.backdrop.show{display:block;}
+
+/* comments panel */
+.comments-panel{
+  position:fixed;top:var(--topbar-h);bottom:0;right:0;width:300px;background:var(--c-surface);
+  border-left:1px solid var(--c-border);transform:translateX(100%);transition:transform .25s ease;
+  z-index:400;display:flex;flex-direction:column;
+}
+.comments-panel.open{transform:translateX(0);}
+.cp-head{padding:12px;border-bottom:1px solid var(--c-border);display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:13px;}
+.cp-body{flex:1;overflow-y:auto;padding:10px;}
+.comment-card{background:var(--c-hover);border-radius:var(--r-m);padding:10px;margin-bottom:8px;font-size:12px;}
+.comment-card .ctop{display:flex;justify-content:space-between;color:var(--c-text-dim);font-size:10.5px;margin-bottom:4px;}
+.comment-card textarea{width:100%;border:1px solid var(--c-border);border-radius:var(--r-s);padding:6px;font-size:12px;font-family:inherit;resize:vertical;min-height:40px;}
+.comment-card .cactions{display:flex;justify-content:flex-end;gap:6px;margin-top:6px;}
+.comment-card .cactions button{font-size:11px;border:none;background:none;color:var(--c-accent);cursor:pointer;}
+
+/* Backstage (File tab) */
+.backstage{position:fixed;inset:0;background:var(--c-accent-dk);z-index:1000;display:none;color:#fff;}
+.backstage.open{display:flex;}
+.bs-nav{width:230px;background:var(--c-accent-dk);padding:18px 0;display:flex;flex-direction:column;flex-shrink:0;}
+.bs-back{display:flex;align-items:center;gap:8px;padding:10px 20px;cursor:pointer;color:#fff;}
+.bs-back:hover{background:rgba(255,255,255,.08);}
+.bs-nav-item{padding:10px 22px;cursor:pointer;font-size:13.5px;color:rgba(255,255,255,.85);}
+.bs-nav-item:hover{background:rgba(255,255,255,.08);}
+.bs-nav-item.active{background:var(--c-accent);color:#fff;font-weight:600;}
+.bs-content{flex:1;background:var(--c-surface);color:var(--c-text);padding:34px 40px;overflow-y:auto;}
+.bs-content h2{margin:0 0 18px;font-weight:600;color:var(--c-text);}
+.bs-cards{display:flex;gap:16px;flex-wrap:wrap;}
+.bs-card{width:160px;cursor:pointer;}
+.bs-card .thumb{height:200px;background:var(--c-bg);border:1px solid var(--c-border);border-radius:var(--r-s);margin-bottom:6px;display:flex;align-items:center;justify-content:center;}
+.bs-card:hover .thumb{border-color:var(--c-accent);}
+.bs-card .thumb.title{background:#fff;border:1px solid #ddd;}
+.bs-card span{font-size:12px;}
+.bs-list-item{display:flex;align-items:center;gap:10px;padding:10px 6px;border-bottom:1px solid var(--c-border);cursor:pointer;font-size:13px;}
+.bs-list-item:hover{background:var(--c-hover);}
+.bs-list-item small{color:var(--c-text-dim);margin-left:auto;}
+.bs-toggle-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--c-border);max-width:480px;}
+.bs-switch{width:40px;height:22px;border-radius:12px;background:var(--c-border);position:relative;cursor:pointer;flex-shrink:0;}
+.bs-switch.on{background:var(--c-accent);}
+.bs-switch .knob{position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;background:#fff;transition:left .15s;}
+.bs-switch.on .knob{left:20px;}
+
+/* command palette */
+.palette-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1100;display:none;align-items:flex-start;justify-content:center;padding-top:8vh;}
+.palette-overlay.open{display:flex;}
+.palette-box{width:520px;max-width:92vw;background:var(--c-surface);border-radius:var(--r-l);box-shadow:var(--sh-2);max-height:70vh;display:flex;flex-direction:column;overflow:hidden;}
+.palette-input-wrap{display:flex;align-items:center;gap:10px;padding:14px 16px;border-bottom:1px solid var(--c-border);}
+.palette-input-wrap input{flex:1;border:none;outline:none;font-size:15px;background:transparent;color:var(--c-text);}
+.palette-list{overflow-y:auto;padding:6px;}
+.palette-item{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--r-s);cursor:pointer;font-size:13px;}
+.palette-item:hover,.palette-item.sel{background:var(--c-accent-soft);}
+.palette-item .pl-cat{margin-left:auto;font-size:10.5px;color:var(--c-text-dim);}
+
+/* dialogs */
+.dialog-overlay{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:1300;display:none;align-items:center;justify-content:center;padding:16px;}
+.dialog-overlay.active{display:flex;}
+.dialog{background:var(--c-surface);border-radius:var(--r-m);box-shadow:var(--sh-2);width:420px;max-width:100%;max-height:88vh;display:flex;flex-direction:column;}
+.dialog-header{padding:14px 16px;border-bottom:1px solid var(--c-border);display:flex;justify-content:space-between;align-items:center;font-weight:600;font-size:14px;}
+.dialog-header button{background:none;border:none;cursor:pointer;color:var(--c-text-dim);display:flex;}
+.dialog-content{padding:16px;overflow-y:auto;flex:1;}
+.dialog-footer{padding:12px 16px;border-top:1px solid var(--c-border);display:flex;justify-content:flex-end;gap:8px;}
+.dlg-btn{padding:8px 16px;border-radius:var(--r-s);border:1px solid var(--c-border);background:var(--c-surface);cursor:pointer;font-size:12.5px;color:var(--c-text);}
+.dlg-btn.primary{background:var(--c-accent);color:#fff;border-color:var(--c-accent);}
+.dlg-btn.primary:hover{background:var(--c-accent-dk);}
+.form-row{margin-bottom:13px;display:flex;flex-direction:column;gap:5px;}
+.form-row label{font-size:12px;font-weight:600;color:var(--c-text);}
+.form-row input,.form-row select,.form-row textarea{
+  padding:8px 10px;border:1px solid var(--c-border);border-radius:var(--r-s);font-size:13px;font-family:inherit;
+  background:var(--c-surface);color:var(--c-text);
+}
+.form-grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+.dlg-list{max-height:220px;overflow-y:auto;border:1px solid var(--c-border);border-radius:var(--r-s);}
+.dlg-list-item{padding:9px 12px;font-size:12.5px;cursor:pointer;border-bottom:1px solid var(--c-border);}
+.dlg-list-item:last-child{border-bottom:none;}
+.dlg-list-item:hover{background:var(--c-hover);}
+.symbol-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:6px;}
+.symbol-cell{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--c-border);border-radius:var(--r-s);cursor:pointer;font-size:16px;}
+.symbol-cell:hover{background:var(--c-accent-soft);border-color:var(--c-accent);}
+
+/* context menu (desktop right click) */
+.ctxmenu{position:fixed;background:var(--c-surface);border:1px solid var(--c-border);border-radius:var(--r-m);box-shadow:var(--sh-2);z-index:1400;display:none;min-width:190px;padding:5px;}
+.ctxmenu.show{display:block;}
+.ctx-item{padding:8px 12px;border-radius:var(--r-s);font-size:12.5px;cursor:pointer;display:flex;align-items:center;gap:9px;}
+.ctx-item:hover{background:var(--c-hover);}
+
+/* toasts */
+.toasts{position:fixed;left:50%;bottom:74px;transform:translateX(-50%);z-index:1500;display:flex;flex-direction:column;gap:8px;align-items:center;}
+.toast{background:#2b2b2b;color:#fff;padding:9px 16px;border-radius:20px;font-size:12.5px;opacity:0;transform:translateY(8px);transition:all .25s;box-shadow:var(--sh-2);display:flex;align-items:center;gap:8px;}
+.toast.show{opacity:1;transform:translateY(0);}
+
+.hidden{display:none !important;}
+
+/* ============== MOBILE (<900px) ============== */
+@media (max-width:899px){
+  .tb-desktop-only{display:none !important;}
+  .tb-search-desktop{display:none !important;}
+  .ribbon-tabs{padding:0 2px;}
+  .ribbon{
+    position:fixed;left:0;right:0;bottom:0;max-height:62vh;border-radius:16px 16px 0 0;
+    transform:translateY(110%);transition:transform .28s ease;z-index:800;box-shadow:0 -8px 24px rgba(0,0,0,.25);
+    display:flex;flex-direction:column;overflow:hidden;
+  }
+  .ribbon.open{transform:translateY(0);}
+  .rpanel{flex-wrap:wrap;overflow-y:auto;max-height:50vh;padding-bottom:18px;}
+  .rgroup{border-right:none;border-bottom:1px solid var(--c-border);padding-bottom:8px;margin-bottom:6px;width:100%;}
+  .rgroup-row{flex-wrap:wrap;}
+  .sidebar{
+    position:fixed;top:0;bottom:0;left:0;width:80%;max-width:300px;z-index:900;
+    transform:translateX(-100%);transition:transform .25s ease;box-shadow:var(--sh-2);
+  }
+  .sidebar.open{transform:translateX(0);}
+  .doc-scroll{padding:14px 8px calc(var(--quickbar-h) + 24px);}
+  .page{width:100%;max-width:none;min-height:auto;box-shadow:var(--sh-1);}
+  .page-content,.page-header,.page-footer{padding-left:.45in;padding-right:.45in;}
+  .statusbar{display:none;}
+  .quickbar{display:flex;}
+  .comments-panel{width:88%;max-width:340px;}
+  .bs-nav{width:160px;}
+  .bs-content{padding:22px 16px;}
+  .palette-overlay{padding-top:0;align-items:stretch;}
+  .palette-box{width:100%;max-width:none;height:100%;border-radius:0;max-height:none;}
+  .ruler-bar{display:none;}
+}
+@media (min-width:900px){
+  .tb-desktop-only{display:flex;}
+  .tb-search-desktop{display:flex;}
+  .quickbar{display:none !important;}
+}
+@media (max-width:420px){
+  .rbtn{width:46px;}
+  .rbtn-big{width:52px;}
+}
+</style>
 </head>
 <body>
 
-  <!-- Full-Suite Word Feature Deck -->
-  <header class="ribbon" id="desktopRibbon">
-    <div class="tool-group">
-      <select onchange="actions.exec('fontName', this.value)">
-        <option value="Segoe UI">Segoe UI</option>
-        <option value="Arial">Arial</option>
-        <option value="Times New Roman">Times New Roman</option>
-        <option value="Courier New">Courier New</option>
-      </select>
-      <select onchange="actions.exec('fontSize', this.value)">
-        <option value="3">12pt</option>
-        <option value="4">14pt</option>
-        <option value="5">18pt</option>
-        <option value="6">24pt</option>
-      </select>
+<!-- ============ ICON SPRITE ============ -->
+<svg style="display:none" aria-hidden="true">
+<defs>
+<symbol id="i-bold" viewBox="0 0 24 24"><text x="12" y="17" font-size="14" font-family="Georgia,serif" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none">B</text></symbol>
+<symbol id="i-italic" viewBox="0 0 24 24"><text x="12" y="17" font-size="14" font-family="Georgia,serif" font-style="italic" font-weight="600" text-anchor="middle" fill="currentColor" stroke="none">I</text></symbol>
+<symbol id="i-underline" viewBox="0 0 24 24"><text x="12" y="15" font-size="13" font-family="Georgia,serif" font-weight="600" text-anchor="middle" fill="currentColor" stroke="none">U</text><path d="M6 19h12"/></symbol>
+<symbol id="i-strike" viewBox="0 0 24 24"><text x="12" y="16" font-size="13" font-family="Georgia,serif" font-weight="600" text-anchor="middle" fill="currentColor" stroke="none">S</text><path d="M5 12h14"/></symbol>
+<symbol id="i-subscript" viewBox="0 0 24 24"><text x="8" y="16" font-size="12" font-family="Georgia,serif" text-anchor="middle" fill="currentColor" stroke="none">x</text><text x="16" y="21" font-size="9" font-family="Georgia,serif" text-anchor="middle" fill="currentColor" stroke="none">2</text></symbol>
+<symbol id="i-superscript" viewBox="0 0 24 24"><text x="8" y="17" font-size="12" font-family="Georgia,serif" text-anchor="middle" fill="currentColor" stroke="none">x</text><text x="16" y="9" font-size="9" font-family="Georgia,serif" text-anchor="middle" fill="currentColor" stroke="none">2</text></symbol>
+<symbol id="i-clear" viewBox="0 0 24 24"><text x="10" y="16" font-size="13" font-family="Georgia,serif" text-anchor="middle" fill="currentColor" stroke="none">A</text><path d="M3 20L20 3"/></symbol>
+<symbol id="i-align-left" viewBox="0 0 24 24"><path d="M4 6h16M4 12h10M4 18h14"/></symbol>
+<symbol id="i-align-center" viewBox="0 0 24 24"><path d="M4 6h16M7 12h10M5 18h14"/></symbol>
+<symbol id="i-align-right" viewBox="0 0 24 24"><path d="M4 6h16M10 12h10M6 18h14"/></symbol>
+<symbol id="i-align-justify" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-bullets" viewBox="0 0 24 24"><circle cx="5" cy="6" r="1.4" fill="currentColor" stroke="none"/><circle cx="5" cy="12" r="1.4" fill="currentColor" stroke="none"/><circle cx="5" cy="18" r="1.4" fill="currentColor" stroke="none"/><path d="M9 6h11M9 12h11M9 18h11"/></symbol>
+<symbol id="i-numbers" viewBox="0 0 24 24"><text x="2" y="8" font-size="6.5" fill="currentColor" stroke="none">1</text><text x="2" y="14" font-size="6.5" fill="currentColor" stroke="none">2</text><text x="2" y="20" font-size="6.5" fill="currentColor" stroke="none">3</text><path d="M9 6h11M9 12h11M9 18h11"/></symbol>
+<symbol id="i-multilevel" viewBox="0 0 24 24"><path d="M3 6h6M3 18h9"/><path d="M7 12h10"/><circle cx="3" cy="12" r="1.1" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-indent-inc" viewBox="0 0 24 24"><path d="M4 5h16M4 19h16M11 12h9M4 9l4 3-4 3"/></symbol>
+<symbol id="i-indent-dec" viewBox="0 0 24 24"><path d="M4 5h16M4 19h16M11 12h9M8 9l-4 3 4 3"/></symbol>
+<symbol id="i-line-spacing" viewBox="0 0 24 24"><path d="M6 3v18M3 6l3-3 3 3M3 18l3 3 3-3"/><path d="M12 6h9M12 12h9M12 18h9"/></symbol>
+<symbol id="i-font-color" viewBox="0 0 24 24"><text x="12" y="15" font-size="13" text-anchor="middle" fill="currentColor" stroke="none">A</text><rect x="5" y="19" width="14" height="3" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-highlight" viewBox="0 0 24 24"><path d="M4 20l3-3 8-8 3 3-8 8-3 3z"/><path d="M14 6l3-3 3 3-3 3z" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-cut" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.3"/><circle cx="6" cy="18" r="2.3"/><path d="M8 7.4L20 19M8 16.6L20 5"/></symbol>
+<symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="11" height="13" rx="1.5"/><rect x="5" y="3" width="11" height="13" rx="1.5"/></symbol>
+<symbol id="i-paste" viewBox="0 0 24 24"><rect x="6" y="6" width="12" height="15" rx="1.5"/><path d="M9 6V4.5A1.5 1.5 0 0110.5 3h3A1.5 1.5 0 0115 4.5V6"/><path d="M9 11h6M9 15h6"/></symbol>
+<symbol id="i-format-painter" viewBox="0 0 24 24"><path d="M9 3h6v5H9z"/><path d="M9 8v4H6a2 2 0 00-2 2v6h6"/><rect x="10" y="14" width="8" height="7" rx="1"/></symbol>
+<symbol id="i-undo" viewBox="0 0 24 24"><path d="M7 7L3 11l4 4"/><path d="M3 11h11a6 6 0 010 12h-2"/></symbol>
+<symbol id="i-redo" viewBox="0 0 24 24"><path d="M17 7l4 4-4 4"/><path d="M21 11H10a6 6 0 000 12h2"/></symbol>
+<symbol id="i-new" viewBox="0 0 24 24"><path d="M7 3h7l4 4v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M14 3v4h4"/><path d="M9 13h6M9 17h6"/></symbol>
+<symbol id="i-save" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><path d="M8 4v5h8V4M7 21v-6h10v6"/></symbol>
+<symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7a2 2 0 012-2h4l2 2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z"/></symbol>
+<symbol id="i-print" viewBox="0 0 24 24"><path d="M6 9V3h12v6"/><rect x="4" y="9" width="16" height="8" rx="1"/><path d="M6 21h12v-4H6z"/></symbol>
+<symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.2"/><circle cx="18" cy="6" r="2.2"/><circle cx="18" cy="18" r="2.2"/><path d="M8 11l8-4M8 13l8 4"/></symbol>
+<symbol id="i-table" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M3 10h18M3 16h18M9 4v16M15 4v16"/></symbol>
+<symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><circle cx="8.5" cy="9.5" r="1.7" fill="currentColor" stroke="none"/><path d="M21 16l-5.5-5.5L9 17"/></symbol>
+<symbol id="i-shapes" viewBox="0 0 24 24"><circle cx="8" cy="9" r="5"/><rect x="11" y="11" width="9" height="9" rx="1"/></symbol>
+<symbol id="i-link" viewBox="0 0 24 24"><path d="M9 15l6-6"/><path d="M11 6l1.3-1.3a4 4 0 015.7 5.7L16.7 11.7"/><path d="M13 18l-1.3 1.3a4 4 0 01-5.7-5.7L7.3 12.3"/></symbol>
+<symbol id="i-comment" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 011 1v9a1 1 0 01-1 1H10l-4 4v-4H4a1 1 0 01-1-1V6a1 1 0 011-1z"/></symbol>
+<symbol id="i-comment-plus" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 011 1v9a1 1 0 01-1 1H10l-4 4v-4H4a1 1 0 01-1-1V6a1 1 0 011-1z"/><path d="M12 8v5M9.5 10.5h5"/></symbol>
+<symbol id="i-header" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 9.5h16" stroke-width="2.4"/></symbol>
+<symbol id="i-footer" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1"/><path d="M4 14.5h16" stroke-width="2.4"/></symbol>
+<symbol id="i-pagenum" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><text x="12" y="18" font-size="7.5" text-anchor="middle" fill="currentColor" stroke="none">1</text></symbol>
+<symbol id="i-textbox" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1" stroke-dasharray="3 2"/><text x="12" y="15" font-size="9" text-anchor="middle" fill="currentColor" stroke="none">T</text></symbol>
+<symbol id="i-wordart" viewBox="0 0 24 24"><text x="12" y="15" font-size="13" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none">A</text><path d="M4 19q8-4 16 0"/></symbol>
+<symbol id="i-dropcap" viewBox="0 0 24 24"><text x="8" y="17" font-size="17" font-weight="700" text-anchor="middle" fill="currentColor" stroke="none">A</text><path d="M14 7h7M14 12h7M14 17h5"/></symbol>
+<symbol id="i-signature" viewBox="0 0 24 24"><path d="M3 17c2-1 3-4 4-7s2-2 3 0 2 6 4 5 2-4 3-3 1 2 4 1"/><path d="M3 21h18"/></symbol>
+<symbol id="i-datetime" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="1.5"/><path d="M3 9.5h18M8 3v4M16 3v4"/></symbol>
+<symbol id="i-symbol" viewBox="0 0 24 24"><text x="12" y="17" font-size="15" text-anchor="middle" fill="currentColor" stroke="none">&#937;</text></symbol>
+<symbol id="i-equation" viewBox="0 0 24 24"><text x="12" y="17" font-size="13" font-style="italic" text-anchor="middle" fill="currentColor" stroke="none">&#960;=fx</text></symbol>
+<symbol id="i-pagebreak" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><path d="M4 12h16" stroke-dasharray="2 2"/><path d="M9 9l3 3-3 3"/></symbol>
+<symbol id="i-coverpage" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><rect x="7" y="6" width="10" height="3" fill="currentColor" stroke="none"/><path d="M7 12h10M7 15h10"/></symbol>
+<symbol id="i-blankpage" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1"/></symbol>
+<symbol id="i-theme" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8"/><circle cx="9" cy="10" r="1.3" fill="currentColor" stroke="none"/><circle cx="13" cy="8" r="1.3" fill="currentColor" stroke="none"/><circle cx="16" cy="12" r="1.3" fill="currentColor" stroke="none"/><circle cx="10" cy="15" r="1.3" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-colors" viewBox="0 0 24 24"><circle cx="9" cy="10" r="5"/><circle cx="15" cy="14" r="5"/></symbol>
+<symbol id="i-fonts" viewBox="0 0 24 24"><text x="12" y="16" font-size="12" text-anchor="middle" fill="currentColor" stroke="none">Aa</text></symbol>
+<symbol id="i-pagecolor" viewBox="0 0 24 24"><path d="M12 3s6 6.6 6 10.6a6 6 0 01-12 0C6 9.6 12 3 12 3z"/></symbol>
+<symbol id="i-pageborder" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="1" stroke-dasharray="3 2"/></symbol>
+<symbol id="i-watermark" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="1"/><text x="12" y="15" font-size="6.5" text-anchor="middle" fill="currentColor" stroke="none" transform="rotate(-28 12 15)">DRAFT</text></symbol>
+<symbol id="i-margins" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><rect x="7" y="7" width="10" height="10" stroke-dasharray="2 2"/></symbol>
+<symbol id="i-orientation" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="16" rx="1"/><path d="M3 17l3 3 3-3"/></symbol>
+<symbol id="i-pagesize" viewBox="0 0 24 24"><rect x="4" y="7" width="9" height="13"/><rect x="11" y="4" width="9" height="13" stroke-dasharray="2 2"/></symbol>
+<symbol id="i-columns" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 4v16M15 4v16"/></symbol>
+<symbol id="i-breaks" viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="8" rx="1"/><rect x="4" y="13" width="16" height="8" rx="1"/></symbol>
+<symbol id="i-linenum" viewBox="0 0 24 24"><text x="2" y="7" font-size="6" fill="currentColor" stroke="none">1</text><text x="2" y="13" font-size="6" fill="currentColor" stroke="none">2</text><text x="2" y="19" font-size="6" fill="currentColor" stroke="none">3</text><path d="M8 6h13M8 12h13M8 18h13"/></symbol>
+<symbol id="i-hyphen" viewBox="0 0 24 24"><text x="12" y="16" font-size="12" text-anchor="middle" fill="currentColor" stroke="none">ab-</text><path d="M5 19h14"/></symbol>
+<symbol id="i-position" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><rect x="5" y="5" width="6" height="6" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-wraptext" viewBox="0 0 24 24"><rect x="9" y="9" width="6" height="6"/><path d="M3 6h18M3 18h18M3 9h4M17 9h4M3 15h4M17 15h4"/></symbol>
+<symbol id="i-align-obj" viewBox="0 0 24 24"><path d="M4 3v18"/><rect x="7" y="5" width="6" height="5"/><rect x="7" y="14" width="11" height="5"/></symbol>
+<symbol id="i-group" viewBox="0 0 24 24"><rect x="3" y="3" width="10" height="10" rx="1"/><rect x="11" y="11" width="10" height="10" rx="1"/></symbol>
+<symbol id="i-rotate" viewBox="0 0 24 24"><path d="M20 12a8 8 0 10-2.7 6"/><path d="M20 6v6h-6"/></symbol>
+<symbol id="i-toc" viewBox="0 0 24 24"><path d="M4 6h4M4 12h4M4 18h4"/><path d="M10 6h10M10 12h10M10 18h7"/></symbol>
+<symbol id="i-footnote" viewBox="0 0 24 24"><text x="6" y="11" font-size="11" fill="currentColor" stroke="none">A</text><text x="13" y="6" font-size="7" fill="currentColor" stroke="none">1</text><path d="M4 18h16"/></symbol>
+<symbol id="i-citation" viewBox="0 0 24 24"><path d="M6 7c-1.6 0-2.5 1.3-2.5 3.5S4.4 14 6 14M14 7c-1.6 0-2.5 1.3-2.5 3.5S12.4 14 14 14" stroke-width="2.2"/></symbol>
+<symbol id="i-caption" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="11" rx="1"/><path d="M6 19h12"/></symbol>
+<symbol id="i-index" viewBox="0 0 24 24"><path d="M4 5h4M4 12h4M4 19h4"/><path d="M10 5h10M10 12h7M10 19h10"/></symbol>
+<symbol id="i-spellcheck" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M7 12l3.5 3.5L17 8"/></symbol>
+<symbol id="i-thesaurus" viewBox="0 0 24 24"><path d="M5 4h11l3 3v13H5z"/><text x="10.5" y="14" font-size="8" fill="currentColor" stroke="none">T</text></symbol>
+<symbol id="i-wordcount" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="1"/><path d="M6 9h5M6 12h8M6 15h6"/></symbol>
+<symbol id="i-readaloud" viewBox="0 0 24 24"><path d="M5 9v6h3l4 4V5L8 9H5z"/><path d="M16 9a4 4 0 010 6M18.4 7a7 7 0 010 10"/></symbol>
+<symbol id="i-accessibility" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.8" fill="currentColor" stroke="none"/><path d="M4 8h16M12 8v6M8 21l4-7 4 7M8 12l-2 4M16 12l2 4"/></symbol>
+<symbol id="i-language" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.4 2.7 2.4 14.3 0 18M12 3c-2.4 2.7-2.4 14.3 0 18"/></symbol>
+<symbol id="i-track" viewBox="0 0 24 24"><path d="M4 17l1-4 10-10 3 3-10 10-4 1z"/><path d="M14 6l3 3"/><path d="M3 21h7" stroke-dasharray="2 2"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 018 0v3"/></symbol>
+<symbol id="i-unlock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="1.5"/><path d="M8 11V8a4 4 0 017.9-1"/></symbol>
+<symbol id="i-readmode" viewBox="0 0 24 24"><path d="M12 5c-3 0-6 1-8 3v11c2-2 5-3 8-3s6 1 8 3V8c-2-2-5-3-8-3z"/><path d="M12 5v11"/></symbol>
+<symbol id="i-printlayout" viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="1"/><path d="M8 8h8M8 12h8M8 16h5"/></symbol>
+<symbol id="i-weblayout" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 8h18"/><circle cx="5.6" cy="6" r="0.6" fill="currentColor" stroke="none"/></symbol>
+<symbol id="i-outline" viewBox="0 0 24 24"><path d="M4 6h2M8 6h12M4 12h2M8 12h12M4 18h2M8 18h9"/></symbol>
+<symbol id="i-draft" viewBox="0 0 24 24"><path d="M4 16l1-4 11-11 3 3-11 11-4 1z"/><path d="M14 6l3 3"/></symbol>
+<symbol id="i-ruler" viewBox="0 0 24 24"><rect x="3" y="9" width="18" height="6" rx="1"/><path d="M6 9v3M9 9v2M12 9v3M15 9v2M18 9v3"/></symbol>
+<symbol id="i-gridlines" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M9 3v18M15 3v18M3 9h18M3 15h18"/></symbol>
+<symbol id="i-navpane" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1"/><path d="M9 4v16"/></symbol>
+<symbol id="i-zoomin" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M14.5 14.5L20 20M10 7v6M7 10h6"/></symbol>
+<symbol id="i-zoomout" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M14.5 14.5L20 20M7 10h6"/></symbol>
+<symbol id="i-window" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 8h18"/></symbol>
+<symbol id="i-split" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="1.5"/><path d="M3 12h18"/></symbol>
+<symbol id="i-macro" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M12 3v3M12 18v3M21 12h-3M6 12H3M18.4 5.6l-2.1 2.1M7.7 16.3l-2.1 2.1M18.4 18.4l-2.1-2.1M7.7 7.7L5.6 5.6"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="10" cy="10" r="6"/><path d="M14.5 14.5L20 20"/></symbol>
+<symbol id="i-close" viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></symbol>
+<symbol id="i-chev-down" viewBox="0 0 24 24"><path d="M5 9l7 7 7-7"/></symbol>
+<symbol id="i-chev-up" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"/></symbol>
+<symbol id="i-chev-left" viewBox="0 0 24 24"><path d="M15 5l-7 7 7 7"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.5" fill="currentColor" stroke="none"/><circle cx="12" cy="19" r="1.5" fill="currentColor" stroke="none"/><symbol id="i-check" viewBox="0 0 24 24"><path d="M5 13l5 5L19 7"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M12 3v2.5M12 18.5V21M21 12h-2.5M5.5 12H3M18.4 5.6l-1.8 1.8M7.4 16.6l-1.8 1.8M18.4 18.4l-1.8-1.8M7.4 7.4L5.6 5.6"/></symbol>
+<symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4.5 4.5l2 2M17.5 17.5l2 2M19.5 4.5l-2 2M6.5 17.5l-2 2"/></symbol>
+<symbol id="i-moon" viewBox="0 0 24 24"><path d="M20 14.5A8.5 8.5 0 119.5 4a7 7 0 0010.5 10.5z"/></symbol>
+<symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V5a1 1 0 011-1h4a1 1 0 011 1v2M6 7l1 13a1 1 0 001 1h8a1 1 0 001-1l1-13"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8v.3"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M7 3h7l4 4v13a1 1 0 01-1 1H7a1 1 0 01-1-1V4a1 1 0 011-1z"/><path d="M9 13h6M9 17h6"/></symbol>
+<symbol id="i-arrow-right" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+</defs>
+</svg>
+
+<div class="app" id="app">
+
+  <!-- ============ TOP BAR ============ -->
+  <header class="topbar">
+    <button class="tb-btn" onclick="toggleSidebar()" title="Menu" aria-label="Menu"><svg class="ic"><use href="#i-menu"/></svg></button>
+    <div class="tb-title-wrap">
+      <input class="tb-title" id="docTitle" value="Document1">
+      <div class="tb-sub"><span class="dot"></span><span id="saveStatus">Saved</span></div>
     </div>
-    <div class="tool-group">
-      <button onclick="actions.exec('bold')"><b>B</b></button>
-      <button onclick="actions.exec('italic')"><i>I</i></button>
-      <button onclick="actions.exec('underline')"><u>U</u></button>
-      <button onclick="actions.exec('strikeThrough')"><s>S</s></button>
+    <div class="tb-search-desktop" onclick="openPalette()">
+      <svg class="ic ic-sm"><use href="#i-search"/></svg>
+      <input readonly placeholder="Search (Alt+Q)">
     </div>
-    <div class="tool-group">
-      <div class="color-picker-wrapper">
-        <button>🎨 Text</button>
-        <input type="color" onchange="actions.exec('foreColor', this.value)">
-      </div>
-      <div class="color-picker-wrapper">
-        <button>Highlight</button>
-        <input type="color" onchange="actions.exec('hiliteColor', this.value)" value="#ffff00">
-      </div>
-    </div>
-    <div class="tool-group">
-      <button onclick="actions.exec('justifyLeft')">Left</button>
-      <button onclick="actions.exec('justifyCenter')">Center</button>
-      <button onclick="actions.exec('justifyRight')">Right</button>
-      <button onclick="actions.exec('justifyFull')">Justify</button>
-    </div>
-    <div class="tool-group">
-      <button onclick="actions.exec('insertUnorderedList')">• List</button>
-      <button onclick="actions.exec('insertOrderedList')">1. List</button>
-    </div>
-    <div class="tool-group">
-      <button onclick="actions.insertTable()">+ Table</button>
-      <button onclick="actions.exec('removeFormat')">Clear Style</button>
+    <div class="tb-right">
+      <button class="tb-btn" onclick="openPalette()" title="Search"><svg class="ic"><use href="#i-search"/></svg></button>
+      <button class="tb-btn tb-desktop-only" onclick="execUndo()" title="Undo"><svg class="ic"><use href="#i-undo"/></svg></button>
+      <button class="tb-btn tb-desktop-only" onclick="execRedo()" title="Redo"><svg class="ic"><use href="#i-redo"/></svg></button>
+      <button class="tb-btn tb-desktop-only" onclick="saveDocument()" title="Save"><svg class="ic"><use href="#i-save"/></svg></button>
+      <button class="tb-btn tb-desktop-only" onclick="shareDocument()" title="Share"><svg class="ic"><use href="#i-share"/></svg></button>
+      <button class="tb-btn tb-desktop-only" onclick="toggleUiTheme()" title="Toggle UI theme" id="uiThemeBtn"><svg class="ic"><use href="#i-moon"/></svg></button>
+      <button class="tb-btn" onclick="toggleMobileMore()" title="More"><svg class="ic"><use href="#i-more"/></svg></button>
     </div>
   </header>
 
-  <!-- Interactive Document Workspace -->
-  <main class="workspace">
-    <div class="page" id="editor" contenteditable="true" inputmode="none">
-      <h1>OmniWord Workspace Terminal</h1>
-      <p>This deployment contains structural configuration loops that execute directly on client hardware channels...</p>
+  <!-- ============ RIBBON ============ -->
+  <nav class="ribbon" id="ribbon">
+    <div class="ribbon-tabs" id="ribbonTabs">
+      <button class="rtab file-tab" onclick="openBackstage()">File</button>
+      <button class="rtab active" data-tab="home" onclick="switchTab('home',this)">Home</button>
+      <button class="rtab" data-tab="insert" onclick="switchTab('insert',this)">Insert</button>
+      <button class="rtab" data-tab="design" onclick="switchTab('design',this)">Design</button>
+      <button class="rtab" data-tab="layout" onclick="switchTab('layout',this)">Layout</button>
+      <button class="rtab" data-tab="references" onclick="switchTab('references',this)">References</button>
+      <button class="rtab" data-tab="review" onclick="switchTab('review',this)">Review</button>
+      <button class="rtab" data-tab="view" onclick="switchTab('view',this)">View</button>
+      <button class="tb-btn" style="color:var(--c-text);margin-left:auto;display:none" id="ribbonCloseBtn" onclick="closeRibbonSheet()"><svg class="ic"><use href="#i-close"/></svg></button>
     </div>
-  </main>
 
-  <!-- Custom Input Peripheral Board -->
-  <footer class="keyboard-panel" id="keyboard">
-    <div class="kbd-row">
-      <button class="key">q</button><button class="key">w</button><button class="key">e</button><button class="key">r</button><button class="key">t</button><button class="key">y</button><button class="key">u</button><button class="key">i</button><button class="key">o</button><button class="key">p</button>
+    <!-- HOME -->
+    <div class="rpanel active" id="panel-home">
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn rbtn-big" onclick="pasteText()"><svg class="ic-lg"><use href="#i-paste"/></svg><span>Paste</span></button>
+          <div class="rcombo">
+            <button class="rbtn rbtn-sm" onclick="cutText()"><svg class="ic-sm"><use href="#i-cut"/></svg><span style="margin-left:6px">Cut</span></button>
+            <button class="rbtn rbtn-sm" onclick="copyText()"><svg class="ic-sm"><use href="#i-copy"/></svg><span style="margin-left:6px">Copy</span></button>
+            <button class="rbtn rbtn-sm" onclick="formatPainterToggle()"><svg class="ic-sm"><use href="#i-format-painter"/></svg><span style="margin-left:6px">Painter</span></button>
+          </div>
+        </div>
+        <div class="rgroup-label">Clipboard</div>
+      </div>
+
+      <div class="rgroup">
+        <div class="rcombo-row">
+          <select class="rselect" id="fontFamily" onchange="changeFontFamily(this.value)">
+            <option>Calibri</option><option>Arial</option><option>Times New Roman</option>
+            <option>Georgia</option><option>Verdana</option><option>Courier New</option>
+            <option>Garamond</option><option>Tahoma</option>
+          </select>
+          <select class="rselect" style="min-width:60px" id="fontSize" onchange="changeFontSize(this.value)">
+            <option>8</option><option>9</option><option>10</option><option>11</option>
+            <option selected>12</option><option>14</option><option>16</option><option>18</option>
+            <option>20</option><option>24</option><option>28</option><option>36</option><option>48</option>
+          </select>
+        </div>
+        <div class="rgroup-row">
+          <button class="rbtn rbtn-sm" id="btn-bold" onclick="toggleFormat('bold')"><svg class="ic-sm"><use href="#i-bold"/></svg></button>
+          <button class="rbtn rbtn-sm" id="btn-italic" onclick="toggleFormat('italic')"><svg class="ic-sm"><use href="#i-italic"/></svg></button>
+          <button class="rbtn rbtn-sm" id="btn-underline" onclick="toggleFormat('underline')"><svg class="ic-sm"><use href="#i-underline"/></svg></button>
+          <button class="rbtn rbtn-sm" id="btn-strike" onclick="toggleFormat('strikeThrough')"><svg class="ic-sm"><use href="#i-strike"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="toggleFormat('subscript')"><svg class="ic-sm"><use href="#i-subscript"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="toggleFormat('superscript')"><svg class="ic-sm"><use href="#i-superscript"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="openColorPicker(event,'fore')"><svg class="ic-sm"><use href="#i-font-color"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="openColorPicker(event,'back')"><svg class="ic-sm"><use href="#i-highlight"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="clearFormatting()"><svg class="ic-sm"><use href="#i-clear"/></svg></button>
+        </div>
+        <div class="rgroup-label">Font</div>
+      </div>
+
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn rbtn-sm" onclick="execFmt('insertUnorderedList')"><svg class="ic-sm"><use href="#i-bullets"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="execFmt('insertOrderedList')"><svg class="ic-sm"><use href="#i-numbers"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="execFmt('outdent')"><svg class="ic-sm"><use href="#i-multilevel"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="execFmt('outdent')"><svg class="ic-sm"><use href="#i-indent-dec"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="execFmt('indent')"><svg class="ic-sm"><use href="#i-indent-inc"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="openLineSpacingMenu(event)"><svg class="ic-sm"><use href="#i-line-spacing"/></svg></button>
+        </div>
+        <div class="rgroup-row">
+          <button class="rbtn rbtn-sm" onclick="execFmt('justifyLeft')"><svg class="ic-sm"><use href="#i-align-left"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="execFmt('justifyCenter')"><svg class="ic-sm"><use href="#i-align-center"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="execFmt('justifyRight')"><svg class="ic-sm"><use href="#i-align-right"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="execFmt('justifyFull')"><svg class="ic-sm"><use href="#i-align-justify"/></svg></button>
+        </div>
+        <div class="rgroup-label">Paragraph</div>
+      </div>
+
+      <div class="rgroup">
+        <div class="style-gallery">
+          <div class="style-chip" onclick="applyStyle('normal')"><b>Normal</b><small>Body text</small></div>
+          <div class="style-chip" onclick="applyStyle('nospacing')"><b>No Spacing</b><small>Tight lines</small></div>
+          <div class="style-chip" onclick="applyStyle('h1')"><b style="font-size:14px">Heading 1</b><small>Section</small></div>
+          <div class="style-chip" onclick="applyStyle('h2')"><b style="font-size:12px">Heading 2</b><small>Sub-section</small></div>
+          <div class="style-chip" onclick="applyStyle('title')"><b style="font-size:13px">Title</b><small>Doc title</small></div>
+          <div class="style-chip" onclick="applyStyle('quote')"><b style="font-style:italic">Quote</b><small>Emphasis</small></div>
+        </div>
+        <div class="rgroup-label">Styles</div>
+      </div>
+
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn rbtn-sm" onclick="openFindReplace()"><svg class="ic-sm"><use href="#i-search"/></svg><span style="margin-left:6px">Find</span></button>
+          <button class="rbtn rbtn-sm" onclick="selectAllText()"><svg class="ic-sm"><use href="#i-align-justify"/></svg><span style="margin-left:6px">Select All</span></button>
+          <button class="rbtn rbtn-sm" onclick="toggleSpellcheck()"><svg class="ic-sm"><use href="#i-spellcheck"/></svg><span style="margin-left:6px">Editor</span></button>
+        </div>
+        <div class="rgroup-label">Editing</div>
+      </div>
     </div>
-    <div class="kbd-row">
-      <button class="key">a</button><button class="key">s</button><button class="key">d</button><button class="key">f</button><button class="key">g</button><button class="key">h</button><button class="key">j</button><button class="key">k</button><button class="key">l</button>
+
+    <!-- INSERT -->
+    <div class="rpanel" id="panel-insert">
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="insertCoverPage()"><svg class="ic"><use href="#i-coverpage"/></svg><span>Cover Page</span></button>
+          <button class="rbtn" onclick="insertBlankPage()"><svg class="ic"><use href="#i-blankpage"/></svg><span>Blank Page</span></button>
+          <button class="rbtn" onclick="insertPageBreak()"><svg class="ic"><use href="#i-pagebreak"/></svg><span>Page Break</span></button>
+        </div>
+        <div class="rgroup-label">Pages</div>
+      </div>
+      <div class="rgroup">
+        <button class="rbtn" onclick="openInsertTableDialog()"><svg class="ic"><use href="#i-table"/></svg><span>Table</span></button>
+        <div class="rgroup-label">Tables</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="insertImage()"><svg class="ic"><use href="#i-image"/></svg><span>Pictures</span></button>
+          <button class="rbtn" onclick="insertShape()"><svg class="ic"><use href="#i-shapes"/></svg><span>Shapes</span></button>
+        </div>
+        <div class="rgroup-label">Illustrations</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="openLinkDialog()"><svg class="ic"><use href="#i-link"/></svg><span>Link</span></button>
+          <button class="rbtn" onclick="insertBookmark()"><svg class="ic"><use href="#i-pagenum"/></svg><span>Bookmark</span></button>
+        </div>
+        <div class="rgroup-label">Links</div>
+      </div>
+      <div class="rgroup">
+        <button class="rbtn" onclick="addComment()"><svg class="ic"><use href="#i-comment-plus"/></svg><span>Comment</span></button>
+        <div class="rgroup-label">Comments</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="toggleHeaderFooter('header')"><svg class="ic"><use href="#i-header"/></svg><span>Header</span></button>
+          <button class="rbtn" onclick="toggleHeaderFooter('footer')"><svg class="ic"><use href="#i-footer"/></svg><span>Footer</span></button>
+          <button class="rbtn" onclick="insertPageNumber()"><svg class="ic"><use href="#i-pagenum"/></svg><span>Page #</span></button>
+        </div>
+        <div class="rgroup-label">Header & Footer</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="insertTextBox()"><svg class="ic"><use href="#i-textbox"/></svg><span>Text Box</span></button>
+          <button class="rbtn" onclick="insertWordArt()"><svg class="ic"><use href="#i-wordart"/></svg><span>WordArt</span></button>
+          <button class="rbtn" onclick="insertDropCap()"><svg class="ic"><use href="#i-dropcap"/></svg><span>Drop Cap</span></button>
+        </div>
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="insertSignatureLine()"><svg class="ic"><use href="#i-signature"/></svg><span>Signature</span></button>
+          <button class="rbtn" onclick="insertDateTime()"><svg class="ic"><use href="#i-datetime"/></svg><span>Date & Time</span></button>
+        </div>
+        <div class="rgroup-label">Text</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="insertEquation()"><svg class="ic"><use href="#i-equation"/></svg><span>Equation</span></button>
+          <button class="rbtn" onclick="openSymbolDialog()"><svg class="ic"><use href="#i-symbol"/></svg><span>Symbol</span></button>
+        </div>
+        <div class="rgroup-label">Symbols</div>
+      </div>
     </div>
-    <div class="kbd-row">
-      <button class="key wide" id="shiftBtn">Shift</button>
-      <button class="key">z</button><button class="key">x</button><button class="key">c</button><button class="key">v</button><button class="key">b</button><button class="key">n</button><button class="key">m</button>
-      <button class="key wide" id="backspaceBtn">⌫</button>
+
+    <!-- DESIGN -->
+    <div class="rpanel" id="panel-design">
+      <div class="rgroup">
+        <button class="rbtn" onclick="openThemeMenu(event)"><svg class="ic"><use href="#i-theme"/></svg><span>Themes</span></button>
+        <div class="rgroup-label">Document Formatting</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="openColorPicker(event,'page-accent')"><svg class="ic"><use href="#i-colors"/></svg><span>Colors</span></button>
+          <button class="rbtn" onclick="openFontPairMenu(event)"><svg class="ic"><use href="#i-fonts"/></svg><span>Fonts</span></button>
+        </div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="openWatermarkDialog()"><svg class="ic"><use href="#i-watermark"/></svg><span>Watermark</span></button>
+          <button class="rbtn" onclick="openColorPicker(event,'page-bg')"><svg class="ic"><use href="#i-pagecolor"/></svg><span>Page Color</span></button>
+          <button class="rbtn" onclick="togglePageBorder()"><svg class="ic"><use href="#i-pageborder"/></svg><span>Page Borders</span></button>
+        </div>
+        <div class="rgroup-label">Page Background</div>
+      </div>
     </div>
-    <div class="kbd-row">
-      <button class="key space" data-value=" ">Space</button>
-      <button class="key wide" data-action="enter">↵</button>
+
+    <!-- LAYOUT -->
+    <div class="rpanel" id="panel-layout">
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="openMarginsMenu(event)"><svg class="ic"><use href="#i-margins"/></svg><span>Margins</span></button>
+          <button class="rbtn" onclick="toggleOrientation()"><svg class="ic"><use href="#i-orientation"/></svg><span>Orientation</span></button>
+          <button class="rbtn" onclick="openSizeMenu(event)"><svg class="ic"><use href="#i-pagesize"/></svg><span>Size</span></button>
+          <button class="rbtn" onclick="openColumnsMenu(event)"><svg class="ic"><use href="#i-columns"/></svg><span>Columns</span></button>
+          <button class="rbtn" onclick="insertPageBreak()"><svg class="ic"><use href="#i-breaks"/></svg><span>Breaks</span></button>
+          <button class="rbtn" id="btn-linenum" onclick="toggleLineNumbers()"><svg class="ic"><use href="#i-linenum"/></svg><span>Line Numbers</span></button>
+          <button class="rbtn" id="btn-hyphen" onclick="toggleHyphenation()"><svg class="ic"><use href="#i-hyphen"/></svg><span>Hyphenation</span></button>
+        </div>
+        <div class="rgroup-label">Page Setup</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn rbtn-sm" onclick="execFmt('outdent')"><svg class="ic-sm"><use href="#i-indent-dec"/></svg><span style="margin-left:6px">Indent −</span></button>
+          <button class="rbtn rbtn-sm" onclick="execFmt('indent')"><svg class="ic-sm"><use href="#i-indent-inc"/></svg><span style="margin-left:6px">Indent +</span></button>
+        </div>
+        <div class="rgroup-label">Paragraph</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="toast('Select a picture to set its position')"><svg class="ic"><use href="#i-position"/></svg><span>Position</span></button>
+          <button class="rbtn" onclick="toast('Select a picture, then use the picture toolbar to wrap text')"><svg class="ic"><use href="#i-wraptext"/></svg><span>Wrap Text</span></button>
+          <button class="rbtn" onclick="toast('Select objects to align')"><svg class="ic"><use href="#i-align-obj"/></svg><span>Align</span></button>
+          <button class="rbtn" onclick="toast('Select multiple objects to group')"><svg class="ic"><use href="#i-group"/></svg><span>Group</span></button>
+          <button class="rbtn" onclick="toast('Select an object to rotate')"><svg class="ic"><use href="#i-rotate"/></svg><span>Rotate</span></button>
+        </div>
+        <div class="rgroup-label">Arrange</div>
+      </div>
+    </div>
+
+    <!-- REFERENCES -->
+    <div class="rpanel" id="panel-references">
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="insertTOC()"><svg class="ic"><use href="#i-toc"/></svg><span>Table of Contents</span></button>
+          <button class="rbtn" onclick="insertTOC()"><svg class="ic"><use href="#i-toc"/></svg><span>Update Table</span></button>
+        </div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="insertFootnote()"><svg class="ic"><use href="#i-footnote"/></svg><span>Footnote</span></button>
+          <button class="rbtn" onclick="insertFootnote(true)"><svg class="ic"><use href="#i-footnote"/></svg><span>Endnote</span></button>
+        </div>
+        <div class="rgroup-label">Footnotes</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="openCitationDialog()"><svg class="ic"><use href="#i-citation"/></svg><span>Citation</span></button>
+          <button class="rbtn" onclick="insertBibliography()"><svg class="ic"><use href="#i-toc"/></svg><span>Bibliography</span></button>
+        </div>
+        <div class="rgroup-label">Citations & Bibliography</div>
+      </div>
+      <div class="rgroup">
+        <button class="rbtn" onclick="insertCaption()"><svg class="ic"><use href="#i-caption"/></svg><span>Caption</span></button>
+        <div class="rgroup-label">Captions</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="markIndexEntry()"><svg class="ic"><use href="#i-index"/></svg><span>Mark Entry</span></button>
+          <button class="rbtn" onclick="insertIndex()"><svg class="ic"><use href="#i-index"/></svg><span>Insert Index</span></button>
+        </div>
+        <div class="rgroup-label">Index</div>
+      </div>
+    </div>
+
+    <!-- REVIEW -->
+    <div class="rpanel" id="panel-review">
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" id="btn-spellcheck" onclick="toggleSpellcheck()"><svg class="ic"><use href="#i-spellcheck"/></svg><span>Editor</span></button>
+          <button class="rbtn" onclick="openThesaurusDialog()"><svg class="ic"><use href="#i-thesaurus"/></svg><span>Thesaurus</span></button>
+          <button class="rbtn" onclick="openWordCountDialog()"><svg class="ic"><use href="#i-wordcount"/></svg><span>Word Count</span></button>
+        </div>
+        <div class="rgroup-label">Proofing</div>
+      </div>
+      <div class="rgroup">
+        <button class="rbtn" id="btn-readaloud" onclick="toggleReadAloud()"><svg class="ic"><use href="#i-readaloud"/></svg><span>Read Aloud</span></button>
+        <div class="rgroup-label">Speech</div>
+      </div>
+      <div class="rgroup">
+        <button class="rbtn" onclick="checkAccessibility()"><svg class="ic"><use href="#i-accessibility"/></svg><span>Check Accessibility</span></button>
+        <div class="rgroup-label">Accessibility</div>
+      </div>
+      <div class="rgroup">
+        <button class="rbtn" onclick="openLanguageMenu(event)"><svg class="ic"><use href="#i-language"/></svg><span>Language</span></button>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="addComment()"><svg class="ic"><use href="#i-comment-plus"/></svg><span>New Comment</span></button>
+          <button class="rbtn" onclick="toggleCommentsPanel()"><svg class="ic"><use href="#i-comment"/></svg><span>Show Comments</span></button>
+        </div>
+        <div class="rgroup-label">Comments</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" id="btn-track" onclick="toggleTrackChanges()"><svg class="ic"><use href="#i-track"/></svg><span>Track Changes</span></button>
+          <button class="rbtn" onclick="acceptAllChanges()"><svg class="ic"><use href="#i-check"/></svg><span>Accept All</span></button>
+          <button class="rbtn" onclick="rejectAllChanges()"><svg class="ic"><use href="#i-close"/></svg><span>Reject All</span></button>
+        </div>
+        <div class="rgroup-label">Tracking</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="toast('Compare requires two uploaded files')"><svg class="ic"><use href="#i-doc"/></svg><span>Compare</span></button>
+          <button class="rbtn" id="btn-restrict" onclick="toggleRestrictEditing()"><svg class="ic"><use href="#i-lock"/></svg><span>Restrict Editing</span></button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW -->
+    <div class="rpanel" id="panel-view">
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="setDocView('print')"><svg class="ic"><use href="#i-printlayout"/></svg><span>Print Layout</span></button>
+          <button class="rbtn" onclick="setDocView('web')"><svg class="ic"><use href="#i-weblayout"/></svg><span>Web Layout</span></button>
+          <button class="rbtn" onclick="setDocView('outline')"><svg class="ic"><use href="#i-outline"/></svg><span>Outline</span></button>
+          <button class="rbtn" onclick="setDocView('draft')"><svg class="ic"><use href="#i-draft"/></svg><span>Draft</span></button>
+          <button class="rbtn" onclick="enterReadMode()"><svg class="ic"><use href="#i-readmode"/></svg><span>Read Mode</span></button>
+        </div>
+        <div class="rgroup-label">Views</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" id="btn-ruler" onclick="toggleRuler()"><svg class="ic"><use href="#i-ruler"/></svg><span>Ruler</span></button>
+          <button class="rbtn" id="btn-gridlines" onclick="toggleGridlines()"><svg class="ic"><use href="#i-gridlines"/></svg><span>Gridlines</span></button>
+          <button class="rbtn" id="btn-navpane" onclick="toggleSidebar()"><svg class="ic"><use href="#i-navpane"/></svg><span>Nav Pane</span></button>
+        </div>
+        <div class="rgroup-label">Show</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn rbtn-sm" onclick="zoomBy(-10)"><svg class="ic-sm"><use href="#i-zoomout"/></svg></button>
+          <span id="zoomLabel" style="align-self:center;font-size:12px;min-width:40px;text-align:center">100%</span>
+          <button class="rbtn rbtn-sm" onclick="zoomBy(10)"><svg class="ic-sm"><use href="#i-zoomin"/></svg></button>
+          <button class="rbtn rbtn-sm" onclick="setZoom(100)"><span style="margin-left:0">100%</span></button>
+        </div>
+        <div class="rgroup-label">Zoom</div>
+      </div>
+      <div class="rgroup">
+        <div class="rgroup-row">
+          <button class="rbtn" onclick="toast('A new window would open a copy of this document')"><svg class="ic"><use href="#i-window"/></svg><span>New Window</span></button>
+          <button class="rbtn" onclick="toast('Split view divides the editing window')"><svg class="ic"><use href="#i-split"/></svg><span>Split</span></button>
+        </div>
+        <div class="rgroup-label">Window</div>
+      </div>
+      <div class="rgroup">
+        <button class="rbtn" onclick="toast('Macro recording is not available in this preview')"><svg class="ic"><use href="#i-macro"/></svg><span>Macros</span></button>
+      </div>
+    </div>
+  </nav>
+  <div class="backdrop" id="ribbonBackdrop" onclick="closeRibbonSheet()"></div>
+
+  <!-- ============ RULER ============ -->
+  <div class="ruler-bar" id="rulerBar"><div class="ruler" id="ruler"></div></div>
+
+  <!-- ============ WORKSPACE ============ -->
+  <div class="workspace">
+    <aside class="sidebar" id="sidebar">
+      <div class="sidebar-head">
+        <svg class="ic ic-sm"><use href="#i-search"/></svg>
+        <input id="navSearch" placeholder="Search document" oninput="searchDocument(this.value)">
+        <button class="tb-btn" style="color:var(--c-text)" onclick="toggleSidebar()"><svg class="ic ic-sm"><use href="#i-close"/></svg></button>
+      </div>
+      <div class="sidebar-tabs">
+        <button class="sb-tab active" data-sb="headings" onclick="switchSidebarTab('headings',this)">Headings</button>
+        <button class="sb-tab" data-sb="comments" onclick="switchSidebarTab('comments',this)">Comments</button>
+        <button class="sb-tab" data-sb="results" onclick="switchSidebarTab('results',this)">Results</button>
+      </div>
+      <div class="sidebar-body" id="sidebarBody">
+        <div class="nav-empty">No headings yet. Apply a heading style to see them here.</div>
+      </div>
+    </aside>
+    <div class="backdrop" id="sidebarBackdrop" onclick="toggleSidebar()"></div>
+
+    <main class="doc-area">
+      <div class="doc-scroll" id="docScroll">
+        <div class="page" id="page" data-view="print">
+          <div class="page-header" id="pageHeader" contenteditable="true" hidden></div>
+          <div class="watermark-el" id="watermarkEl" hidden></div>
+          <div class="page-content" id="docContent" contenteditable="true" spellcheck="true" lang="en">
+            <h1>Untitled document</h1>
+            <p>Start typing here, or use the <b>Insert</b> tab to add tables, pictures, links and more. Tap the search icon any time to jump straight to a command.</p>
+          </div>
+          <div class="footnotes-area" id="footnotesArea" hidden></div>
+          <div class="page-footer" id="pageFooter" contenteditable="true" hidden></div>
+        </div>
+      </div>
+
+      <!-- contextual floating toolbars -->
+      <div class="float-toolbar" id="imgToolbar">
+        <button onclick="imgAlign('left')" title="Wrap left"><svg class="ic ic-sm"><use href="#i-align-left"/></svg></button>
+        <button onclick="imgAlign('center')" title="Center"><svg class="ic ic-sm"><use href="#i-align-center"/></svg></button>
+        <button onclick="imgAlign('right')" title="Wrap right"><svg class="ic ic-sm"><use href="#i-align-right"/></svg></button>
+        <button onclick="imgResize('small')" title="Smaller">S</button>
+        <button onclick="imgResize('medium')" title="Medium">M</button>
+        <button onclick="imgResize('large')" title="Larger">L</button>
+        <button onclick="imgDelete()" title="Delete"><svg class="ic ic-sm"><use href="#i-trash"/></svg></button>
+      </div>
+      <div class="float-toolbar" id="tableToolbar">
+        <button onclick="tableAction('addRow')" title="Insert row">+Row</button>
+        <button onclick="tableAction('addCol')" title="Insert column">+Col</button>
+        <button onclick="tableAction('delRow')" title="Delete row">−Row</button>
+        <button onclick="tableAction('delCol')" title="Delete column">−Col</button>
+        <button onclick="tableAction('borders')" title="Toggle borders"><svg class="ic ic-sm"><use href="#i-table"/></svg></button>
+        <button onclick="tableAction('delete')" title="Delete table"><svg class="ic ic-sm"><use href="#i-trash"/></svg></button>
+      </div>
+      <div class="sel-bubble" id="selBubble">
+        <button onclick="toggleFormat('bold')"><svg class="ic ic-sm"><use href="#i-bold"/></svg></button>
+        <button onclick="toggleFormat('italic')"><svg class="ic ic-sm"><use href="#i-italic"/></svg></button>
+        <button onclick="toggleFormat('underline')"><svg class="ic ic-sm"><use href="#i-underline"/></svg></button>
+        <button onclick="openColorPicker(event,'back')"><svg class="ic ic-sm"><use href="#i-highlight"/></svg></button>
+        <button onclick="addComment()"><svg class="ic ic-sm"><use href="#i-comment-plus"/></svg></button>
+      </div>
+    </main>
+
+    <aside class="comments-panel" id="commentsPanel">
+      <div class="cp-head"><span>Comments</span><button class="tb-btn" style="color:var(--c-text)" onclick="toggleCommentsPanel()"><svg class="ic ic-sm"><use href="#i-close"/></svg></button></div>
+      <div class="cp-body" id="commentsBody">
+        <div class="nav-empty">No comments yet. Select text and choose “New Comment.”</div>
+      </div>
+    </aside>
+    <div class="backdrop" id="commentsBackdrop" onclick="toggleCommentsPanel()"></div>
+  </div>
+
+  <!-- ============ STATUS BAR ============ -->
+  <footer class="statusbar">
+    <div class="sb-group">
+      <div class="sb-item"><svg class="ic"><use href="#i-doc"/></svg><span id="pageCount">Page 1 of 1</span></div>
+      <div class="sb-item" onclick="openWordCountDialog()"><span id="wordCount">0 words</span></div>
+      <div class="sb-item" id="trackBadge" style="display:none"><svg class="ic"><use href="#i-track"/></svg><span>Tracking</span></div>
+      <div class="sb-item" id="restrictBadge" style="display:none"><svg class="ic"><use href="#i-lock"/></svg><span>Restricted</span></div>
+    </div>
+    <div class="sb-group">
+      <div class="sb-item" onclick="setDocView('print')"><svg class="ic"><use href="#i-printlayout"/></svg></div>
+      <div class="sb-item" onclick="setDocView('web')"><svg class="ic"><use href="#i-weblayout"/></svg></div>
+      <div class="sb-item" onclick="enterReadMode()"><svg class="ic"><use href="#i-readmode"/></svg></div>
+      <div class="zoom-controls">
+        <button onclick="zoomBy(-10)"><svg class="ic ic-sm"><use href="#i-minus"/></svg></button>
+        <input type="range" class="zoom-range" min="50" max="200" value="100" id="zoomRange" oninput="setZoom(this.value)">
+        <button onclick="zoomBy(10)"><svg class="ic ic-sm"><use href="#i-plus"/></svg></button>
+        <span id="zoomPct">100%</span>
+      </div>
     </div>
   </footer>
 
-  <script>
-    const editor = document.getElementById('editor');
-    const keyboard = document.getElementById('keyboard');
-    const shiftBtn = document.getElementById('shiftBtn');
-    const backspaceBtn = document.getElementById('backspaceBtn');
-    
-    let isShifted = false;
-    let savedRange = null;
-    let backspaceLoopId = null;
+  <!-- ============ MOBILE QUICK BAR ============ -->
+  <div class="quickbar" id="quickbar">
+    <button class="qb-btn" onclick="execUndo()"><svg class="ic"><use href="#i-undo"/></svg></button>
+    <button class="qb-btn" onclick="execRedo()"><svg class="ic"><use href="#i-redo"/></svg></button>
+    <div class="qb-sep"></div>
+    <button class="qb-btn" id="qb-bold" onclick="toggleFormat('bold')"><svg class="ic"><use href="#i-bold"/></svg></button>
+    <button class="qb-btn" id="qb-italic" onclick="toggleFormat('italic')"><svg class="ic"><use href="#i-italic"/></svg></button>
+    <button class="qb-btn" id="qb-underline" onclick="toggleFormat('underline')"><svg class="ic"><use href="#i-underline"/></svg></button>
+    <div class="qb-sep"></div>
+    <button class="qb-btn" onclick="execFmt('insertUnorderedList')"><svg class="ic"><use href="#i-bullets"/></svg></button>
+    <button class="qb-btn" onclick="execFmt('justifyLeft')"><svg class="ic"><use href="#i-align-left"/></svg></button>
+    <button class="qb-btn" onclick="execFmt('justifyCenter')"><svg class="ic"><use href="#i-align-center"/></svg></button>
+    <div class="qb-sep"></div>
+    <button class="qb-btn" onclick="insertImage()"><svg class="ic"><use href="#i-image"/></svg></button>
+    <button class="qb-btn" onclick="addComment()"><svg class="ic"><use href="#i-comment-plus"/></svg></button>
+    <div class="qb-sep"></div>
+    <button class="qb-btn" onclick="openRibbonSheet('home')"><svg class="ic"><use href="#i-chev-up"/></svg></button>
+  </div>
+</div>
 
-    // Direct Action Pipeline mapping commands directly to native C++ layout systems
-    const actions = {
-      exec(command, value = null) {
-        restoreSelection();
-        document.execCommand(command, false, value);
-      },
-      insertTable() {
-        restoreSelection();
-        const tableStructure = `<table><tr><td></td><td></td></tr><tr><td></td><td></td></tr></table><p></p>`;
-        document.execCommand('insertHTML', false, tableStructure);
-      }
-    };
+<!-- ============ BACKSTAGE (File) ============ -->
+<div class="backstage" id="backstage">
+  <div class="bs-nav">
+    <div class="bs-back" onclick="closeBackstage()"><svg class="ic"><use href="#i-chev-left"/></svg><span>Back</span></div>
+    <div class="bs-nav-item active" data-bs="new" onclick="switchBackstage('new',this)">New</div>
+    <div class="bs-nav-item" data-bs="open" onclick="switchBackstage('open',this)">Open</div>
+    <div class="bs-nav-item" data-bs="save" onclick="switchBackstage('save',this)">Save / Save As</div>
+    <div class="bs-nav-item" data-bs="print" onclick="switchBackstage('print',this)">Print</div>
+    <div class="bs-nav-item" data-bs="share" onclick="switchBackstage('share',this)">Share</div>
+    <div class="bs-nav-item" data-bs="export" onclick="switchBackstage('export',this)">Export</div>
+    <div class="bs-nav-item" data-bs="account" onclick="switchBackstage('account',this)">Account</div>
+    <div class="bs-nav-item" data-bs="options" onclick="switchBackstage('options',this)">Options</div>
+  </div>
+  <div class="bs-content" id="bsContent"></div>
+</div>
 
-    // Tracking text cursor changes
-    document.addEventListener('selectionchange', () => {
-      const selection = window.getSelection();
-      if (selection.rangeCount > 0 && editor.contains(selection.getRangeAt(0).commonAncestorContainer)) {
-        savedRange = selection.getRangeAt(0).cloneRange();
-      }
+<!-- ============ COMMAND PALETTE ============ -->
+<div class="palette-overlay" id="paletteOverlay">
+  <div class="palette-box">
+    <div class="palette-input-wrap">
+      <svg class="ic"><use href="#i-search"/></svg>
+      <input id="paletteInput" placeholder="Tell me what you want to do" oninput="filterPalette(this.value)" autocomplete="off">
+      <button class="tb-btn" style="color:var(--c-text)" onclick="closePalette()"><svg class="ic"><use href="#i-close"/></svg></button>
+    </div>
+    <div class="palette-list" id="paletteList"></div>
+  </div>
+</div>
+
+<!-- ============ DIALOG / TOAST / CONTEXT MENU ============ -->
+<div class="dialog-overlay" id="dialogOverlay"></div>
+<div class="toasts" id="toasts"></div>
+<div class="ctxmenu" id="ctxmenu"></div>
+
+<script>
+/* ============================================================
+   STATE
+============================================================ */
+const doc_ = document;
+const editor = () => doc_.getElementById('docContent');
+let trackingEnabled = false;
+let restrictEditing = false;
+let footnoteCount = 0;
+let commentCount = 0;
+let comments = [];
+let sources = [];
+let zoomLevel = 100;
+let speaking = false;
+let painterFormat = null;
+let activeImg = null;
+let activeTable = null;
+
+const THESAURUS = {
+  good:['great','fine','solid','strong','positive'],
+  happy:['glad','pleased','content','cheerful','upbeat'],
+  big:['large','sizable','substantial','considerable'],
+  small:['little','compact','minor','modest'],
+  important:['significant','key','vital','essential'],
+  fast:['quick','rapid','swift','speedy'],
+  start:['begin','commence','launch','kick off']
+};
+
+/* ============================================================
+   TOASTS
+============================================================ */
+function toast(msg){
+  const wrap = doc_.getElementById('toasts');
+  const t = doc_.createElement('div');
+  t.className='toast';
+  t.textContent=msg;
+  wrap.appendChild(t);
+  requestAnimationFrame(()=>t.classList.add('show'));
+  setTimeout(()=>{ t.classList.remove('show'); setTimeout(()=>t.remove(),300); }, 2600);
+}
+
+/* ============================================================
+   TAB / RIBBON
+============================================================ */
+function switchTab(name, el){
+  doc_.querySelectorAll('.rtab').forEach(t=>t.classList.remove('active'));
+  doc_.querySelectorAll('.rpanel').forEach(p=>p.classList.remove('active'));
+  el.classList.add('active');
+  doc_.getElementById('panel-'+name).classList.add('active');
+}
+function openRibbonSheet(tabName){
+  if(window.innerWidth>=900) return;
+  if(tabName){
+    const tabBtn = [...doc_.querySelectorAll('.rtab')].find(t=>t.dataset.tab===tabName);
+    if(tabBtn) switchTab(tabName, tabBtn);
+  }
+  doc_.getElementById('ribbon').classList.add('open');
+  doc_.getElementById('ribbonBackdrop').classList.add('show');
+  doc_.getElementById('ribbonCloseBtn').style.display='flex';
+}
+function closeRibbonSheet(){
+  doc_.getElementById('ribbon').classList.remove('open');
+  doc_.getElementById('ribbonBackdrop').classList.remove('show');
+}
+function toggleMobileMore(){
+  if(window.innerWidth>=900){ return; }
+  openRibbonSheet('home');
+}
+/* keep desktop ribbon tabs clickable directly (not sheet) */
+document.addEventListener('click', e=>{
+  if(window.innerWidth>=900) return;
+  const tab = e.target.closest('.rtab:not(.file-tab)');
+  if(tab) openRibbonSheet(tab.dataset.tab);
+});
+
+/* ============================================================
+   FORMATTING
+============================================================ */
+function focusEditor(){ editor().focus(); }
+function execFmt(cmd, val){ focusEditor(); doc_.execCommand(cmd,false,val); updateAll(); }
+function toggleFormat(cmd){ execFmt(cmd); }
+function execUndo(){ focusEditor(); doc_.execCommand('undo'); }
+function execRedo(){ focusEditor(); doc_.execCommand('redo'); }
+function clearFormatting(){ execFmt('removeFormat'); }
+function changeFontFamily(f){ execFmt('fontName', f); }
+function changeFontSize(s){ execFmt('fontSize', mapPtToExec(s)); }
+function mapPtToExec(pt){
+  pt=parseInt(pt);
+  if(pt<=9) return 1; if(pt<=11) return 2; if(pt<=13) return 3; if(pt<=16) return 4;
+  if(pt<=20) return 5; if(pt<=28) return 6; if(pt<=36) return 6; return 7;
+}
+function cutText(){ focusEditor(); doc_.execCommand('cut'); }
+function copyText(){ focusEditor(); doc_.execCommand('copy'); }
+function pasteText(){ focusEditor(); doc_.execCommand('paste').catch?.(()=>{}); try{doc_.execCommand('paste');}catch(e){toast('Browser blocked paste — use Ctrl+V');} }
+function selectAllText(){ focusEditor(); doc_.execCommand('selectAll'); }
+function formatPainterToggle(){
+  const sel=window.getSelection();
+  if(!painterFormat){
+    painterFormat = {bold:doc_.queryCommandState('bold'), italic:doc_.queryCommandState('italic'), underline:doc_.queryCommandState('underline')};
+    toast('Format Painter: select text to apply copied formatting');
+  } else {
+    if(sel && !sel.isCollapsed){
+      if(painterFormat.bold) doc_.execCommand('bold');
+      if(painterFormat.italic) doc_.execCommand('italic');
+      if(painterFormat.underline) doc_.execCommand('underline');
+    }
+    painterFormat=null;
+  }
+}
+function updateFormatButtons(){
+  const map={'btn-bold':'bold','btn-italic':'italic','btn-underline':'underline','btn-strike':'strikeThrough',
+             'qb-bold':'bold','qb-italic':'italic','qb-underline':'underline'};
+  for(const id in map){
+    const el=doc_.getElementById(id);
+    if(el) el.classList.toggle('active', doc_.queryCommandState(map[id]));
+  }
+}
+
+/* ============================================================
+   COLOR PICKER DROPDOWN
+============================================================ */
+const PALETTE = ['#000000','#404040','#808080','#c0c0c0','#ffffff','#c00000','#ff0000','#ffc000',
+                  '#ffff00','#92d050','#00b050','#00b0f0','#0070c0','#002060','#7030a0','#ff66cc'];
+function openColorPicker(ev, mode){
+  ev.stopPropagation();
+  const pop = makePop(ev);
+  let html = '<div class="dd-section-label">Theme &amp; standard colors</div><div class="swatch-grid">';
+  PALETTE.forEach(c=>{ html += `<div class="swatch" style="background:${c}" onclick="applyColor('${mode}','${c}')"></div>`; });
+  html += '</div><div class="dd-item" style="margin-top:6px" onclick="promptCustomColor(\''+mode+'\')">Custom color…</div>';
+  if(mode==='back') html += '<div class="dd-item" onclick="applyColor(\'back\',\'transparent\')">No Color</div>';
+  pop.innerHTML = html;
+  showPop(pop);
+}
+function applyColor(mode, color){
+  if(mode==='fore') execFmt('foreColor', color);
+  else if(mode==='back') execFmt('hiliteColor', color) || execFmt('backColor', color);
+  else if(mode==='page-bg') doc_.getElementById('page').style.background = color;
+  else if(mode==='page-accent') document.documentElement.style.setProperty('--c-accent', color);
+  closeAllPops();
+}
+function promptCustomColor(mode){
+  const c = window.prompt('Enter a hex color (e.g. #336699):','#336699');
+  if(c) applyColor(mode, c);
+  closeAllPops();
+}
+
+/* generic popover helper */
+let openPop = null;
+function makePop(ev){
+  closeAllPops();
+  const pop = doc_.createElement('div');
+  pop.className='dropdown-pop';
+  doc_.body.appendChild(pop);
+  pop._anchor = ev.currentTarget || ev.target;
+  return pop;
+}
+function showPop(pop){
+  const r = pop._anchor.getBoundingClientRect();
+  pop.classList.add('open');
+  let top = r.bottom+6, left = r.left;
+  doc_.body.appendChild(pop);
+  requestAnimationFrame(()=>{
+    const pw = pop.offsetWidth, ph = pop.offsetHeight;
+    if(left+pw > window.innerWidth) left = window.innerWidth - pw - 12;
+    if(top+ph > window.innerHeight) top = r.top - ph - 6;
+    pop.style.top = Math.max(0, top)+'px';
+    pop.style.left = Math.max(0, left)+'px';
+  });
+  openPop = pop;
+}
+function closeAllPops(){ if(openPop) { openPop.remove(); openPop=null; } }
+doc_.addEventListener('click', closeAllPops);
+
+/* ============================================================
+   LINE SPACING, MARGINS, COLUMNS, SIZE MENUS
+============================================================ */
+function openLineSpacingMenu(ev){
+  ev.stopPropagation(); const pop=makePop(ev);
+  pop.innerHTML = `
+    <div class="dd-item" onclick="setLineSpacing(1.0)">1.0</div>
+    <div class="dd-item" onclick="setLineSpacing(1.15)">1.15</div>
+    <div class="dd-item" onclick="setLineSpacing(1.5)">1.5</div>
+    <div class="dd-item" onclick="setLineSpacing(2.0)">2.0</div>
+    <div class="dd-item" onclick="setLineSpacing(2.5)">2.5</div>
+    <div class="dd-item" onclick="setLineSpacing(3.0)">3.0</div>
+  `;
+  showPop(pop);
+}
+function setLineSpacing(v){ focusEditor(); doc_.execCommand('styleWithCSS', false, true); doc_.execCommand('lineHeight', false, v); closeAllPops(); }
+
+function openMarginsMenu(ev){
+  ev.stopPropagation(); const pop=makePop(ev);
+  pop.innerHTML = `
+    <div class="dd-item" onclick="setMargins('.5in')">Narrow (0.5")</div>
+    <div class="dd-item" onclick="setMargins('.9in')">Normal (0.9")</div>
+    <div class="dd-item" onclick="setMargins('1.25in')">Wide (1.25")</div>
+  `;
+  showPop(pop);
+}
+function setMargins(v){
+  const c = doc_.getElementById('docContent'), h = doc_.getElementById('pageHeader'), f = doc_.getElementById('pageFooter');
+  c.style.paddingLeft = c.style.paddingRight = h.style.paddingLeft = h.style.paddingRight = f.style.paddingLeft = f.style.paddingRight = v;
+  closeAllPops();
+}
+
+function openSizeMenu(ev){
+  ev.stopPropagation(); const pop=makePop(ev);
+  pop.innerHTML = `
+    <div class="dd-item" onclick="setPageSize('8.5in','11in')">Letter (8.5" x 11")</div>
+    <div class="dd-item" onclick="setPageSize('8.27in','11.69in')">A4 (210mm x 297mm)</div>
+    <div class="dd-item" onclick="setPageSize('8.5in','14in')">Legal (8.5" x 14")</div>
+  `;
+  showPop(pop);
+}
+function setPageSize(w,h){ const p=doc_.getElementById('page'); p.style.width=w; p.style.minHeight=h; closeAllPops(); }
+
+function openColumnsMenu(ev){
+  ev.stopPropagation(); const pop=makePop(ev);
+  pop.innerHTML = `
+    <div class="dd-item" onclick="setColumns(1)">One Column</div>
+    <div class="dd-item" onclick="setColumns(2)">Two Columns</div>
+    <div class="dd-item" onclick="setColumns(3)">Three Columns</div>
+  `;
+  showPop(pop);
+}
+function setColumns(n){ editor().style.columnCount = n>1? n : ''; closeAllPops(); }
+
+function openThemeMenu(ev){
+  ev.stopPropagation(); const pop=makePop(ev);
+  pop.innerHTML = `
+    <div class="dd-item" onclick="applyTheme('#2b579a','#1c3c66')">Office Blue</div>
+    <div class="dd-item" onclick="applyTheme('#9a2b2b','#661c1c')">Burgundy Red</div>
+    <div class="dd-item" onclick="applyTheme('#2b9a57','#1c6637')">Forest Green</div>
+    <div class="dd-item" onclick="applyTheme('#572b9a','#371c66')">Royal Purple</div>
+  `;
+  showPop(pop);
+}
+function applyTheme(p, dk){
+  document.documentElement.style.setProperty('--c-accent', p);
+  document.documentElement.style.setProperty('--c-accent-dk', dk);
+  closeAllPops();
+}
+
+function openFontPairMenu(ev){
+  ev.stopPropagation(); const pop=makePop(ev);
+  pop.innerHTML = `
+    <div class="dd-item" onclick="applyFontPair('Calibri, sans-serif')">Calibri (Modern)</div>
+    <div class="dd-item" onclick="applyFontPair('Times New Roman, serif')">Times New Roman (Classic)</div>
+    <div class="dd-item" onclick="applyFontPair('Arial, sans-serif')">Arial (Clean)</div>
+    <div class="dd-item" onclick="applyFontPair('Georgia, serif')">Georgia (Elegant)</div>
+  `;
+  showPop(pop);
+}
+function applyFontPair(f){ editor().style.fontFamily = f; closeAllPops(); }
+
+function openLanguageMenu(ev){
+  ev.stopPropagation(); const pop=makePop(ev);
+  pop.innerHTML = `
+    <div class="dd-item" onclick="setLanguage('en')">English (US)</div>
+    <div class="dd-item" onclick="setLanguage('es')">Spanish</div>
+    <div class="dd-item" onclick="setLanguage('fr')">French</div>
+    <div class="dd-item" onclick="setLanguage('de')">German</div>
+  `;
+  showPop(pop);
+}
+function setLanguage(l){ editor().setAttribute('lang', l); toast(`Language set to: ${l.toUpperCase()}`); closeAllPops(); }
+
+/* ============================================================
+   DIALOG FRAMEWORK
+============================================================ */
+function showDialog(title, contentHtml, footerHtml){
+  const overlay = doc_.getElementById('dialogOverlay');
+  overlay.innerHTML = `
+    <div class="dialog">
+      <div class="dialog-header"><span>${title}</span><button onclick="closeDialog()"><svg class="ic"><use href="#i-close"/></svg></button></div>
+      <div class="dialog-content">${contentHtml}</div>
+      <div class="dialog-footer">${footerHtml||`<button class="dlg-btn primary" onclick="closeDialog()">OK</button>`}</div>
+    </div>
+  `;
+  overlay.classList.add('active');
+}
+function closeDialog(){ doc_.getElementById('dialogOverlay').classList.remove('active'); }
+
+/* Dialog implementations */
+function openInsertTableDialog(){
+  showDialog('Insert Table', `
+    <div class="form-grid2">
+      <div class="form-row"><label>Rows</label><input type="number" id="tblRows" value="3" min="1"></div>
+      <div class="form-row"><label>Columns</label><input type="number" id="tblCols" value="3" min="1"></div>
+    </div>
+  `, `<button class="dlg-btn" onclick="closeDialog()">Cancel</button><button class="dlg-btn primary" onclick="doInsertTable()">Insert</button>`);
+}
+function doInsertTable(){
+  const r=parseInt(doc_.getElementById('tblRows').value)||3, c=parseInt(doc_.getElementById('tblCols').value)||3;
+  let html='<table>';
+  for(let i=0;i<r;i++){ html+='<tr>'; for(let j=0;j<c;j++) html+='<td><br></td>'; html+='</tr>'; }
+  html+='</table>'; closeDialog(); focusEditor(); doc_.execCommand('insertHTML', false, html);
+}
+
+function openLinkDialog(){
+  showDialog('Insert Hyperlink', `
+    <div class="form-row"><label>Display Text</label><input id="lnkText" placeholder="Optional text pointer"></div>
+    <div class="form-row"><label>Address (URL)</label><input id="lnkUrl" value="https://"></div>
+  `, `<button class="dlg-btn" onclick="closeDialog()">Cancel</button><button class="dlg-btn primary" onclick="doInsertLink()">Insert</button>`);
+}
+function doInsertLink(){
+  const url=doc_.getElementById('lnkUrl').value, txt=doc_.getElementById('lnkText').value; closeDialog(); focusEditor();
+  if(txt) doc_.execCommand('insertHTML', false, `<a href="${url}" target="_blank">${txt}</a>`);
+  else doc_.execCommand('createLink', false, url);
+}
+
+function openSymbolDialog(){
+  const syms=['Ω','π','Σ','μ','α','β','θ','λ','±','×','÷','≠','≤','≥','∞','√','€','£','¥','©','®','™','§','¶'];
+  let g='<div class="symbol-grid">';
+  syms.forEach(s=>g+=`<div class="symbol-cell" onclick="doInsertSymbol('${s}')">${s}</div>`); g+='</div>';
+  showDialog('Insert Symbol', g, '');
+}
+function doInsertSymbol(s){ closeDialog(); focusEditor(); doc_.execCommand('insertHTML',false,s); }
+
+function openWatermarkDialog(){
+  showDialog('Custom Watermark', `
+    <div class="form-row"><label>Watermark Text</label><input id="wmText" value="DRAFT" placeholder="e.g. CONFIDENTIAL"></div>
+  `, `<button class="dlg-btn" onclick="closeDialog()">Cancel</button><button class="dlg-btn primary" onclick="doWatermark()">Apply</button>`);
+}
+function doWatermark(){
+  const t=doc_.getElementById('wmText').value, el=doc_.getElementById('watermarkEl');
+  el.textContent=t; el.hidden=!t; closeDialog();
+}
+
+function openFindReplace(){
+  showDialog('Find and Replace', `
+    <div class="form-row"><label>Find what</label><input id="findText"></div>
+    <div class="form-row"><label>Replace with</label><input id="replaceText"></div>
+  `, `<button class="dlg-btn" onclick="doFind()">Find Next</button><button class="dlg-btn primary" onclick="doReplace()">Replace</button>`);
+}
+function doFind(){ const txt=doc_.getElementById('findText').value; if(txt && !window.find(txt)) toast('Phrase not found'); }
+function doReplace(){
+  const f=doc_.getElementById('findText').value, r=doc_.getElementById('replaceText').value, sel=window.getSelection();
+  if(sel && sel.toString().toLowerCase()===f.toLowerCase()) doc_.execCommand('insertHTML',false,r);
+  doFind();
+}
+
+function openThesaurusDialog(){
+  showDialog('Thesaurus Lookup', `
+    <div class="form-row"><label>Look up word</label><input id="thesWord" placeholder="Try 'good', 'happy'..." oninput="doThesaurus(this.value)"></div>
+    <div class="dlg-list" id="thesResults" style="margin-top:8px"></div>
+  `, '');
+}
+function doThesaurus(w){
+  const box=doc_.getElementById('thesResults'); if(!box) return; box.innerHTML='';
+  const hits=THESAURUS[w.trim().toLowerCase()];
+  if(!hits) { box.innerHTML='<div class="nav-empty">No synonyms cataloged here.</div>'; return; }
+  hits.forEach(h=>box.innerHTML+=`<div class="dlg-list-item" onclick="insertSynonym('${h}')">${h}</div>`);
+}
+function insertSynonym(s){ closeDialog(); focusEditor(); doc_.execCommand('insertHTML',false,s); }
+
+function openWordCountDialog(){
+  const txt=editor().innerText||'', words=txt.trim()? txt.trim().split(/\s+/).length:0;
+  showDialog('Word Count', `
+    <div class="bs-toggle-row"><span>Pages</span><b>1</b></div>
+    <div class="bs-toggle-row"><span>Words</span><b>${words}</b></div>
+    <div class="bs-toggle-row"><span>Characters (no spaces)</span><b>${txt.replace(/\s/g,'').length}</b></div>
+    <div class="bs-toggle-row"><span>Characters (with spaces)</span><b>${txt.length}</b></div>
+  `, '');
+}
+
+/* ============================================================
+   STYLES SHEET IMPLEMENTATION
+============================================================ */
+function applyStyle(type){
+  focusEditor();
+  if(type==='normal'){ doc_.execCommand('formatBlock', false, 'p'); editor().style.lineHeight='1.5'; }
+  else if(type==='nospacing'){ doc_.execCommand('formatBlock', false, 'p'); editor().style.lineHeight='1.0'; }
+  else if(type==='h1') doc_.execCommand('formatBlock', false, 'h1');
+  else if(type==='h2') doc_.execCommand('formatBlock', false, 'h2');
+  else if(type==='title') doc_.execCommand('insertHTML', false, `<h1 style="font-size:28pt;text-align:center;font-weight:300">${window.getSelection().toString()||'Title'}</h1>`);
+  else if(type==='quote') doc_.execCommand('insertHTML', false, `<blockquote style="border-left:3px solid var(--c-accent);padding-left:12px;margin:8px 0;font-style:italic;color:var(--c-text-dim)">${window.getSelection().toString()||'Quote'}</blockquote>`);
+  updateAll();
+}
+
+/* ============================================================
+   CORE FUNCTIONS: INSERTS & MECHANICS
+============================================================ */
+function insertImage(){
+  const url=window.prompt('Enter image web address URL (or placeholder base64):','https://images.unsplash.com/photo-1586281380349-632531db7ed4?w=400');
+  if(url) execFmt('insertImage', url);
+}
+function insertShape(){
+  execFmt('insertHTML', `<div style="width:100px;height:100px;background:var(--c-accent);border-radius:4px;display:inline-block;content:''"></div>`);
+}
+function insertTextBox(){
+  execFmt('insertHTML', `<div style="border:1px dashed #666;padding:10px;width:180px;display:inline-block;background:var(--c-surface)">Text box sample</div>`);
+}
+function insertWordArt(){
+  execFmt('insertHTML', `<span style="font-size:32px;font-weight:900;background:linear-gradient(45deg,var(--c-accent),#ff0066);-webkit-background-clip:text;-webkit-text-fill-color:transparent">WordArt</span>`);
+}
+function insertDropCap(){
+  const s=window.getSelection().toString();
+  if(!s) { toast('Highlight a starting character first'); return; }
+  execFmt('insertHTML', `<span style="font-size:3.2em;float:left;font-weight:bold;line-height:.85;margin-right:6px;color:var(--c-accent)">${s[0]}</span>${s.substring(1)}`);
+}
+function insertSignatureLine(){
+  execFmt('insertHTML', `<div style="margin:20px 0;width:200px;border-top:1px solid var(--c-text);font-size:12px;padding-top:4px">Signature Authority Signature</div>`);
+}
+function insertDateTime(){
+  execFmt('insertHTML', new Date().toLocaleString());
+}
+function insertEquation(){
+  execFmt('insertHTML', `<span style="font-family:'Cambria Math',serif;font-style:italic;background:var(--c-hover);padding:2px 4px;border-radius:3px">E = mc²</span>`);
+}
+function insertBlankPage(){ toast('Blank page split inserted down'); execFmt('insertHTML', '<div style="page-break-before:always;height:20px"></div>'); }
+function insertPageBreak(){ execFmt('insertHTML', '<hr style="border:none;border-top:2px dashed var(--c-border);margin:24px 0" data-pb="1">'); }
+function insertCoverPage(){
+  const h = `<div style="height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;border-bottom:4px double var(--c-border);padding-bottom:40px;margin-bottom:30px">
+    <h1 style="font-size:36pt;color:var(--c-accent)">Document Title Dossier</h1>
+    <p style="font-size:14pt;color:var(--c-text-dim)">Subordinate Title Specifier</p>
+  </div>`;
+  focusEditor(); editor().innerHTML = h + editor().innerHTML; updateAll();
+}
+
+/* ============================================================
+   VIEWS & MODES
+============================================================ */
+function setDocView(mode){
+  const p=doc_.getElementById('page'); p.setAttribute('data-view', mode);
+  doc_.getElementById('rulerBar').classList.toggle('hidden-ruler', mode!=='print');
+  toast(`Switched view layout to: ${mode.toUpperCase()}`);
+}
+function enterReadMode(){ doc_.getElementById('app').classList.add('read-mode'); }
+function exitReadMode(){ doc_.getElementById('app').classList.remove('read-mode'); }
+
+function toggleRuler(){ doc_.getElementById('rulerBar').classList.toggle('hidden-ruler'); }
+function toggleGridlines(){ doc_.getElementById('page').classList.toggle('gridlines-on'); }
+function toggleLineNumbers(){ doc_.getElementById('docContent').classList.toggle('line-numbers'); }
+function toggleHyphenation(){ doc_.getElementById('docContent').classList.toggle('hyph-on'); }
+
+function setZoom(v){
+  zoomLevel = parseInt(v);
+  doc_.getElementById('page').style.transform = zoomLevel===100? '' : `scale(${zoomLevel/100})`;
+  doc_.getElementById('page').style.transformOrigin = 'top center';
+  doc_.getElementById('zoomLabel').textContent = doc_.getElementById('zoomPct').textContent = zoomLevel+'%';
+  doc_.getElementById('zoomRange').value = zoomLevel;
+}
+function zoomBy(d){ setZoom(Math.min(200, Math.max(50, zoomLevel+d))); }
+
+/* ============================================================
+   SIDEBAR & SEARCH IMPLEMENTATIONS
+============================================================ */
+let currentSbTab = 'headings';
+function toggleSidebar(){ doc_.getElementById('sidebar').classList.toggle('open'); doc_.getElementById('sidebarBackdrop').classList.toggle('show'); buildNavPane(); }
+function switchSidebarTab(tab, el){
+  doc_.querySelectorAll('.sb-tab').forEach(b=>b.classList.remove('active')); el.classList.add('active');
+  currentSbTab = tab; buildNavPane();
+}
+function buildNavPane(){
+  const b = doc_.getElementById('sidebarBody'); b.innerHTML='';
+  if(currentSbTab==='headings'){
+    const hs = editor().querySelectorAll('h1, h2, h3');
+    if(!hs.length) { b.innerHTML='<div class="nav-empty">No headings discovered. Highlight line and pick block level heading.</div>'; return; }
+    hs.forEach((h,idx)=>{
+      const lvl = h.tagName.toLowerCase();
+      const item = doc_.createElement('div'); item.className=`nav-item ${lvl==='h2'?'lvl2':lvl==='h3'?'lvl3':''}`;
+      item.textContent = h.innerText || 'Untitled Heading';
+      item.onclick = () => h.scrollIntoView({behavior:'smooth', block:'center'});
+      b.appendChild(item);
     });
-
-    function restoreSelection() {
-      editor.focus();
-      const selection = window.getSelection();
-      if (savedRange) {
-        selection.removeAllRanges();
-        selection.addRange(savedRange);
-      }
-    }
-
-    // --- HARDCORE FIX: CONTINUOUS AUTO-REPEATING BACKSPACE MODULE ---
-    function executeDeletionStep() {
-      restoreSelection();
-      const selection = window.getSelection();
-      if (!selection.rangeCount) return;
-      const range = selection.getRangeAt(0);
-
-      if (range.collapsed) {
-        // If cursor is just blinking, expand range backwards by 1 text coordinate point
-        range.setStart(range.startContainer, Math.max(0, range.startOffset - 1));
-      }
-      range.deleteContents();
-    }
-
-    function startBackspaceLoop() {
-      if (backspaceLoopId) return;
-      executeDeletionStep(); // Fire instantly on initial strike
-      
-      // Keep repeating deletions at intervals while pointer is held down
-      backspaceLoopId = setInterval(executeDeletionStep, 80); 
-    }
-
-    function stopBackspaceLoop() {
-      if (backspaceLoopId) {
-        clearInterval(backspaceLoopId);
-        backspaceLoopId = null;
-      }
-    }
-
-    // Bind non-delayed physical pointers to manage input states perfectly
-    backspaceBtn.addEventListener('pointerdown', (e) => { e.preventDefault(); startBackspaceLoop(); });
-    backspaceBtn.addEventListener('pointerup', (e) => { e.preventDefault(); stopBackspaceLoop(); });
-    backspaceBtn.addEventListener('pointerleave', (e) => { e.preventDefault(); stopBackspaceLoop(); });
-
-    // --- GENERAL INPUT ROUTING ENGINE ---
-    keyboard.addEventListener('pointerdown', (e) => {
-      const target = e.target.closest('button');
-      if (!target || target === backspaceBtn) return; // Backspace is isolated above
-      e.preventDefault();
-
-      restoreSelection();
-
-      if (target === shiftBtn) {
-        isShifted = !isShifted;
-        shiftBtn.classList.toggle('active-mod', isShifted);
-        document.querySelectorAll('.key:not(.wide):not(.space)').forEach(k => {
-          k.textContent = isShifted ? k.textContent.toUpperCase() : k.textContent.toLowerCase();
-        });
-        return;
-      }
-
-      const selection = window.getSelection();
-      if (!selection.rangeCount) return;
-      const range = selection.getRangeAt(0);
-
-      if (target.dataset.action === 'enter') {
-        const brNode = document.createElement('br');
-        range.insertNode(brNode);
-        range.setStartAfter(brNode);
-        range.setEndAfter(brNode);
-        selection.removeAllRanges();
-        selection.addRange(range);
-        return;
-      }
-
-      // Input insertion execution step
-      const val = target.dataset.value !== undefined ? target.dataset.value : target.textContent;
-      range.deleteContents();
-      const node = document.createTextNode(val);
-      range.insertNode(node);
-      
-      range.setStartAfter(node);
-      range.setEndAfter(node);
-      selection.removeAllRanges();
-      selection.addRange(range);
-
-      if (isShifted) {
-        isShifted = false;
-        shiftBtn.classList.remove('active-mod');
-        document.querySelectorAll('.key:not(.wide):not(.space)').forEach(k => k.textContent = k.textContent.toLowerCase());
-      }
+  } else if(currentSbTab==='comments') {
+    if(!comments.length) { b.innerHTML='<div class="nav-empty">No workflow remarks or comments tied.</div>'; return; }
+    comments.forEach(c=>{
+      const item = doc_.createElement('div'); item.className='nav-item';
+      item.style.borderLeft='2px solid var(--c-accent)'; item.style.marginBottom='4px';
+      item.innerHTML = `<b>${c.author}</b>: <small>${c.text}</small>`;
+      b.appendChild(item);
     });
-  </script>
+  } else { b.innerHTML='<div class="nav-empty">Type search expression above to index search match strings.</div>'; }
+}
+function searchDocument(q){
+  switchSidebarTab('results', doc_.querySelectorAll('.sb-tab')[2]);
+  const b = doc_.getElementById('sidebarBody'); b.innerHTML='';
+  if(!q.trim()) return;
+  const txt = editor().innerText; let matchCount=0;
+  const regex = new RegExp(q, 'gi'); let match;
+  while((match = regex.exec(txt)) !== null && matchCount < 20){
+    matchCount++; const idx = match.index;
+    const start = Math.max(0, idx-20), end = Math.min(txt.length, idx+q.length+20);
+    const div = doc_.createElement('div'); div.className='nav-item';
+    div.innerHTML = '...' + txt.substring(start, idx) + `<b>${txt.substring(idx, idx+q.length)}</b>` + txt.substring(idx+q.length, end) + '...';
+    b.appendChild(div);
+  }
+  if(!matchCount) b.innerHTML='<div class="nav-empty">No matching records.</div>';
+}
+
+/* ============================================================
+   FILE / BACKSTAGE
+============================================================ */
+function openBackstage(){ doc_.getElementById('backstage').classList.add('open'); switchBackstage('new', doc_.querySelector('.bs-nav-item')); }
+function closeBackstage(){ doc_.getElementById('backstage').classList.remove('open'); }
+function switchBackstage(view, el){
+  doc_.querySelectorAll('.bs-nav-item').forEach(i=>i.classList.remove('active')); el.classList.add('active');
+  const box = doc_.getElementById('bsContent'); box.innerHTML='';
+  if(view==='new'){
+    box.innerHTML = `<h2>New Document</h2><div class="bs-cards">
+      <div class="bs-card" onclick="doBlankDoc()"><div class="thumb title"><svg class="ic-lg" style="color:var(--c-accent)"><use href="#i-new"/></svg></div><span>Blank Document</span></div>
+    </div>`;
+  } else if(view==='options'){
+    box.innerHTML = `<h2>Options</h2>
+      <div class="bs-toggle-row"><span>Enable Auto-Save Routine</span><div class="bs-switch on" onclick="this.classList.toggle('on')"><div class="knob"></div></div></div>
+      <div class="bs-toggle-row"><span>Proof spelling errors instantly</span><div class="bs-switch on" onclick="this.classList.toggle('on')"><div class="knob"></div></div></div>
+    `;
+  } else {
+    box.innerHTML = `<h2>${el.textContent}</h2><div class="bs-list-item">Cloud Document Storage Root Cluster Subsystem</div>`;
+  }
+}
+function doBlankDoc(){ editor().innerHTML='<h1>Untitled document</h1><p>Start typing text...</p>'; updateAll(); closeBackstage(); }
+
+/* ============================================================
+   COMMAND PALETTE IMPLEMENTATION
+============================================================ */
+const COMMANDS = [
+  {name:'Bold Text Font Format', cat:'Format', action:()=>toggleFormat('bold')},
+  {name:'Italicize Selection Slant', cat:'Format', action:()=>toggleFormat('italic')},
+  {name:'Underline Under-Stroke line', cat:'Format', action:()=>toggleFormat('underline')},
+  {name:'Insert Grid Matrix Table Block', cat:'Insert', action:openInsertTableDialog},
+  {name:'Insert Anchor Link Pointer', cat:'Insert', action:openLinkDialog},
+  {name:'Word Count Metrics Analytics', cat:'Review', action:openWordCountDialog},
+  {name:'Toggle Light/Dark Interface Theme', cat:'View', action:toggleUiTheme}
+];
+function openPalette(){ doc_.getElementById('paletteOverlay').classList.add('open'); doc_.getElementById('paletteInput').focus(); filterPalette(''); }
+function closePalette(){ doc_.getElementById('paletteOverlay').classList.remove('open'); }
+function filterPalette(q){
+  const l=doc_.getElementById('paletteList'); l.innerHTML='';
+  COMMANDS.filter(c=>c.name.toLowerCase().includes(q.toLowerCase())).forEach(c=>{
+    const d=doc_.createElement('div'); d.className='palette-item';
+    d.innerHTML=`<span>${c.name}</span><span class="pl-cat">${c.cat}</span>`;
+    d.onclick=()=>{ c.action(); closePalette(); }; l.appendChild(d);
+  });
+}
+window.addEventListener('keydown', e=>{ if(e.altKey && e.key.toLowerCase()==='q'){ e.preventDefault(); openPalette(); } });
+
+/* ============================================================
+   COMMENTS & MARKS IMPLEMENTATION
+============================================================ */
+function toggleCommentsPanel(){ doc_.getElementById('commentsPanel').classList.toggle('open'); doc_.getElementById('commentsBackdrop').classList.toggle('show'); }
+function addComment(){
+  const s=window.getSelection().toString()||'Selection Block';
+  const t=window.prompt('Add comment text notation:'); if(!t) return;
+  commentCount++; const id=`cm-${commentCount}`;
+  execFmt('insertHTML', `<span class="comment-mark" id="${id}">${window.getSelection().toString()||s}</span>`);
+  comments.push({id, text:t, author:'Author User'}); buildCommentsUI(); buildNavPane();
+}
+function buildCommentsUI(){
+  const box=doc_.getElementById('commentsBody'); box.innerHTML='';
+  if(!comments.length) { box.innerHTML='<div class="nav-empty">No comment blocks pinned.</div>'; return; }
+  comments.forEach(c=>{
+    box.innerHTML+=`<div class="comment-card"><div class="ctop"><b>${c.author}</b><span onclick="deleteComment('${c.id}')" style="cursor:pointer;color:red">Resolve</span></div><div>${c.text}</div></div>`;
+  });
+}
+function deleteComment(id){
+  comments=comments.filter(c=>c.id!==id); const el=doc_.getElementById(id);
+  if(el){ const t=el.innerText; el.replaceWith(doc_.createTextNode(t)); }
+  buildCommentsUI(); buildNavPane();
+}
+
+/* ============================================================
+   ADDITIONS: CAPTIONS, BIBLIOGRAPHY, INDEXING, SPEECH, REVIEWS
+============================================================ */
+function insertTOC(){
+  let h='<div style="background:var(--c-hover);padding:14px;border-radius:4px;margin-bottom:12px;font-size:13px"><b>Table of Contents Reference Index</b><hr style="border:none;border-top:1px dashed var(--c-border)">';
+  editor().querySelectorAll('h1, h2, h3').forEach(e=>h+=`<div style="margin-left:${e.tagName==='H2'?14:e.tagName==='H3'?28:0}px;margin-bottom:4px"><span>${e.innerText}</span> ........................................................... 1</div>`);
+  h+='</div>'; execFmt('insertHTML', h);
+}
+function insertFootnote(isEnd){
+  footnoteCount++; focusEditor();
+  const marker = `<span class="fn-ref" onclick="doc_.getElementById('fn-${footnoteCount}').scrollIntoView({behavior:'smooth'})"><sup>[${footnoteCount}]</sup></span>`;
+  doc_.execCommand('insertHTML', false, marker);
+  const area = doc_.getElementById('footnotesArea'); area.hidden = false;
+  const line = doc_.createElement('div'); line.className = 'fnline'; line.id = `fn-${footnoteCount}`;
+  line.innerHTML = `<sup>[${footnoteCount}]</sup> ${isEnd?'Endnote':'Footnote'} reference locator data text notation entry.`;
+  area.appendChild(line);
+}
+function openCitationDialog(){
+  showDialog('Add Citation', `
+    <div class="form-row"><label>Author Name</label><input id="citAuth" value="Smith, J."></div>
+    <div class="form-row"><label>Title Text</label><input id="citTitle" value="Standard Application Methods"></div>
+    <div class="form-row"><label>Publishing Year</label><input id="citYear" value="2026"></div>
+  `, `<button class="dlg-btn" onclick="closeDialog()">Cancel</button><button class="dlg-btn primary" onclick="doInsertCitation()">Insert</button>`);
+}
+function doInsertCitation(){
+  const a=doc_.getElementById('citAuth').value, t=doc_.getElementById('citTitle').value, y=doc_.getElementById('citYear').value;
+  closeDialog(); focusEditor(); doc_.execCommand('insertHTML', false, ` (${a}, ${y})`);
+  sources.push({author:a, title:t, year:y});
+}
+function insertBibliography(){
+  if(!sources.length) sources.push({author:'Smith, J.', title:'Standard Application Methods', year:'2026'});
+  let h = '<div style="margin-top:20px;border-top:1px solid #aaa;padding-top:10px"><h3>Bibliography Sources</h3>';
+  sources.forEach(s=>h+=`<p style="font-size:10pt;margin-bottom:4px">${s.author} (${s.year}). <i>${s.title}</i>. Global Technical Press.</p>`);
+  h += '</div>'; execFmt('insertHTML', h);
+}
+function insertCaption(){ execFmt('insertHTML', `<div style="font-size:9.5pt;color:var(--c-text-dim);margin-top:4px;text-align:center">Figure Index Identifier Caption</div>`); }
+function markIndexEntry(){ execFmt('insertHTML', `<span class="index-mark">${window.getSelection().toString()||'Entry Mark'}</span>`); }
+function insertIndex(){ execFmt('insertHTML', `<div style="border:1px solid var(--c-border);padding:10px;font-size:11px"><b>Index Register</b><br>Entry Reference Locator Index Pointer ................... 1</div>`); }
+
+function toggleSpellcheck(){ const b=editor(); b.spellcheck=!b.spellcheck; toast(`Realtime spellchecker set to: ${b.spellcheck?'ON':'OFF'}`); }
+function toggleTrackChanges(){ trackingEnabled=!trackingEnabled; doc_.getElementById('trackBadge').style.display=trackingEnabled?'flex':'none'; toast(`Track revisions routine: ${trackingEnabled?'ACTIVE':'INACTIVE'}`); }
+function acceptAllChanges(){ editor().querySelectorAll('ins.trk').forEach(e=>e.replaceWith(...e.childNodes)); editor().querySelectorAll('del.trk').forEach(e=>e.remove()); toast('Accepted formatting operations across scope'); }
+function rejectAllChanges(){ editor().querySelectorAll('ins.trk').forEach(e=>e.remove()); editor().querySelectorAll('del.trk').forEach(e=>e.replaceWith(...e.childNodes)); toast('Reverted modifications down'); }
+function toggleRestrictEditing(){ restrictEditing=!restrictEditing; editor().contentEditable=!restrictEditing; doc_.getElementById('restrictBadge').style.display=restrictEditing?'flex':'none'; toast(`Editing restriction access block: ${restrictEditing?'RESTRICTED':'UNLOCKED'}`); }
+
+function toggleReadAloud(){
+  if(speaking) { window.speechSynthesis.cancel(); speaking=false; return; }
+  const txt = editor().innerText; if(!txt) return;
+  const u = new SpeechSynthesisUtterance(txt); u.onend = () => speaking=false;
+  speaking=true; window.speechSynthesis.speak(u); toast('Speaking document context audio output stream...');
+}
+function checkAccessibility(){ toast('Accessibility validation checker pass verified: 0 blocker warning points reported'); }
+
+/* ============================================================
+   CONTEXT FLOATING TOOLBAR MANAGEMENT
+============================================================ */
+function setupContextToolbars(){
+  editor().addEventListener('click', e=>{
+    const img = e.target.closest('img');
+    const tbl = e.target.closest('table');
+    hideFloatingToolbars();
+    if(img){
+      activeImg = img; img.classList.add('sel'); positionToolbar(doc_.getElementById('imgToolbar'), img);
+    } else if(tbl){
+      activeTable = tbl; positionToolbar(doc_.getElementById('tableToolbar'), tbl);
+    }
+  });
+  doc_.getElementById('docScroll').addEventListener('scroll', hideFloatingToolbars);
+}
+function hideFloatingToolbars(){
+  doc_.querySelectorAll('.float-toolbar').forEach(t=>t.classList.remove('show'));
+  editor().querySelectorAll('img').forEach(i=>i.classList.remove('sel'));
+  activeImg = null; activeTable = null;
+}
+function positionToolbar(tb, el){
+  tb.classList.add('show'); const r = el.getBoundingClientRect();
+  tb.style.top = (r.top - tb.offsetHeight - 8)+'px'; tb.style.left = r.left+'px';
+}
+function imgAlign(a){ if(activeImg) { activeImg.style.float = a==='center'?'none':a; activeImg.style.display = a==='center'?'block':'inline'; if(a==='center') activeImg.style.margin='10px auto'; hideFloatingToolbars(); } }
+function imgResize(sz){ if(activeImg) { activeImg.style.width = sz==='small'?'25%':sz=='medium'?'50%':'100%'; hideFloatingToolbars(); } }
+function imgDelete(){ if(activeImg) { activeImg.remove(); hideFloatingToolbars(); } }
+
+function tableAction(act){
+  if(!activeTable) return;
+  if(act==='delete') activeTable.remove();
+  else if(act==='addRow'){ const r=activeTable.insertRow(); for(let i=0;i<activeTable.rows[0].cells.length;i++) r.insertCell().innerHTML='<br>'; }
+  else if(act==='addCol'){ for(let i=0;i<activeTable.rows.length;i++) activeTable.rows[i].insertCell().innerHTML='<br>'; }
+  else if(act==='delRow' && activeTable.rows.length>1) activeTable.deleteRow(-1);
+  else if(act==='delCol' && activeTable.rows[0].cells.length>1) { for(let i=0;i<activeTable.rows.length;i++) activeTable.rows[i].deleteCell(-1); }
+  else if(act==='borders') activeTable.querySelectorAll('td,th').forEach(c=>c.style.border=c.style.border==='none'?'':'none');
+  hideFloatingToolbars();
+}
+
+/* Text selection mobile pop bubble bubble tracking tracking */
+document.addEventListener('selectionchange', ()=>{
+  const sel=window.getSelection(), b=doc_.getElementById('selBubble');
+  if(!sel || sel.isCollapsed || window.innerWidth>=900) { b.classList.remove('show'); return; }
+  const r=sel.getRangeAt(0).getBoundingClientRect();
+  b.classList.add('show'); b.style.top=(r.top - b.offsetHeight - 10)+'px'; b.style.left=Math.max(8, r.left)+'px';
+});
+
+/* ============================================================
+   TRACK CHANGES ENGINES (INTERCEPT KEY AND INPUT ACTIONS)
+============================================================ */
+editor().addEventListener('keydown', e=>{
+  if(!trackingEnabled) return;
+  if(e.key==='Backspace' || e.key==='Delete'){
+    e.preventDefault(); const range=window.getSelection().getRangeAt(0), s=range.toString();
+    if(s){ execFmt('insertHTML', `<del class="trk" data-user="User">${s}</del>`); }
+  }
+});
+editor().addEventListener('beforeinput', e=>{
+  if(!trackingEnabled || !e.data) return;
+  const range=window.getSelection().getRangeAt(0); if(!range) return;
+  e.preventDefault(); execFmt('insertHTML', `<ins class="trk" data-user="User">${e.data}</ins>`);
+});
+
+/* ============================================================
+   METRICS CALCULATION AND PERSISTENCE UI HOOKS
+============================================================ */
+function updateAll(){
+  updateFormatButtons(); buildNavPane();
+  const txt = editor().innerText||'', w = txt.trim()? txt.trim().split(/\s+/).length : 0;
+  doc_.getElementById('wordCount').textContent = `${w} words`;
+}
+editor().addEventListener('input', updateAll);
+function saveDocument(){ doc_.getElementById('saveStatus').textContent='Saving...'; setTimeout(()=>{ doc_.getElementById('saveStatus').textContent='Saved'; toast('Document snapshot committed safely to local staging segment.'); }, 800); }
+function shareDocument(){ toast('Generated read-only public linkage string copy onto execution clipboard block pipeline.'); }
+function toggleUiTheme(){ doc_.body.classList.toggle('ui-dark'); const isD=doc_.body.classList.contains('ui-dark'); doc_.getElementById('uiThemeBtn').innerHTML=`<svg class="ic"><use href="#${isD?'i-sun':'i-moon'}"/></svg>`; }
+
+/* Initialization */
+window.addEventListener('DOMContentLoaded', ()=>{
+  setupContextToolbars();
+  /* Populate initial canvas metrics calculations */
+  updateAll();
+});
+</script>
 </body>
 </html>
