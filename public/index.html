@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <meta name="theme-color" content="#7c4dff">
+  <title>OmniWord — Document Editor</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&family=Open+Sans:wght@400;600;700&family=Lato:wght@400;700&family=Playfair+Display:wght@700&family=Merriweather:wght@400;700&family=Source+Code+Pro:wght@400;600&family=Poppins:wght@400;600;700&family=Raleway:wght@400;700&family=Montserrat:wght@400;600;700&family=Ubuntu:wght@400;500;700&family=Dosis:wght@400;600&family=Cabin:wght@400;600;700&family=Nunito:wght@400;600;700&family=Quicksand:wght@500;600;700&family=Oswald:wght@400;600;700&family=Crimson+Text:wght@400;600&family=Bitter:wght@400;700&family=PT+Sans:wght@400;700&family=Josefin+Sans:wght@400;600;700&family=Cormorant+Garamond:wght@400;600;700&family=Great+Vibes&family=Dancing+Script:wght@600;700&family=Pacifico&family=Righteous&family=Russo+One&family=Varela+Round&family=Lilita+One&family=Fredoka+One&family=Abril+Fatface&family=Bebas+Neue&family=Permanent+Marker&family=Caveat:wght@700&family=Satisfy&family=Indie+Flower&family=Comfortaa:wght@400;700&family=Nunito+Sans:wght@400;600;700&family=Rubik:wght@400;500;700&family=Lexend:wght@400;600&family=Commissioner:wght@400;600;700&family=Inter:wght@400;600;700&family=DM+Sans:wght@400;600;700&family=Space+Grotesk:wght@400;600;700&family=IBM+Plex+Mono:wght@400;600&family=IBM+Plex+Sans:wght@400;600;700&family=IBM+Plex+Serif:wght@400;600;700&family=JetBrains+Mono:wght@400;600&family=Inconsolata:wght@400;700&family=Courier+Prime:wght@400;700&family=Anonymous+Pro:wght@400;700&family=Overpass+Mono:wght@400;600;700" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="app">
+  <div class="app-layout">
+    
+    <!-- TITLE BAR -->
+    <header class="titlebar">
+      <div class="titlebar-left">
+        <button class="btn-icon" title="Save">💾</button>
+        <input type="text" id="docName" class="doc-name-input" value="Document" placeholder="Document name">
+      </div>
+      <div class="titlebar-center">OmniWord</div>
+      <div class="titlebar-right">
+        <button class="btn-icon" title="Print">🖨</button>
+        <button class="btn-icon" id="darkModeToggle" title="Dark Mode">🌙</button>
+      </div>
+    </header>
+
+    <!-- RIBBON TABS -->
+    <nav class="ribbon-tabs">
+      <button class="ribbon-tab active" data-tab="home">Home</button>
+      <button class="ribbon-tab" data-tab="insert">Insert</button>
+      <button class="ribbon-tab" data-tab="layout">Layout</button>
+      <button class="ribbon-tab" data-tab="review">Review</button>
+      <button class="ribbon-tab" data-tab="view">View</button>
+    </nav>
+
+    <!-- RIBBON PANEL -->
+    <div class="ribbon" id="homeRibbon">
+      <div class="ribbon-group">
+        <label>Font</label>
+        <select id="fontFamily" onchange="applyFont(this.value)">
+          <option value="Segoe UI">Segoe UI</option>
+          <option value="Arial">Arial</option>
+          <option value="Times New Roman">Times New Roman</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Verdana">Verdana</option>
+          <option value="Comic Sans MS">Comic Sans MS</option>
+          <option value="Trebuchet MS">Trebuchet MS</option>
+          <option value="Impact">Impact</option>
+          <option value="Palatino">Palatino</option>
+          <optgroup label="Modern Sans">
+            <option value="Roboto">Roboto</option>
+            <option value="Open Sans">Open Sans</option>
+            <option value="Lato">Lato</option>
+            <option value="Poppins">Poppins</option>
+            <option value="Raleway">Raleway</option>
+            <option value="Montserrat">Montserrat</option>
+            <option value="Ubuntu">Ubuntu</option>
+            <option value="Dosis">Dosis</option>
+            <option value="Cabin">Cabin</option>
+            <option value="Nunito">Nunito</option>
+            <option value="Quicksand">Quicksand</option>
+            <option value="Oswald">Oswald</option>
+            <option value="PT Sans">PT Sans</option>
+            <option value="Josefin Sans">Josefin Sans</option>
+            <option value="Varela Round">Varela Round</option>
+            <option value="Nunito Sans">Nunito Sans</option>
+            <option value="Rubik">Rubik</option>
+            <option value="Lexend">Lexend</option>
+            <option value="Commissioner">Commissioner</option>
+            <option value="Inter">Inter</option>
+            <option value="DM Sans">DM Sans</option>
+            <option value="Space Grotesk">Space Grotesk</option>
+          </optgroup>
+          <optgroup label="Classical Serif">
+            <option value="Merriweather">Merriweather</option>
+            <option value="Crimson Text">Crimson Text</option>
+            <option value="Bitter">Bitter</option>
+            <option value="Cormorant Garamond">Cormorant Garamond</option>
+            <option value="IBM Plex Serif">IBM Plex Serif</option>
+          </optgroup>
+          <optgroup label="Monospace">
+            <option value="Source Code Pro">Source Code Pro</option>
+            <option value="IBM Plex Mono">IBM Plex Mono</option>
+            <option value="JetBrains Mono">JetBrains Mono</option>
+            <option value="Inconsolata">Inconsolata</option>
+            <option value="Courier Prime">Courier Prime</option>
+            <option value="Anonymous Pro">Anonymous Pro</option>
+            <option value="Overpass Mono">Overpass Mono</option>
+          </optgroup>
+          <optgroup label="Display">
+            <option value="Playfair Display">Playfair Display</option>
+            <option value="Great Vibes">Great Vibes</option>
+            <option value="Dancing Script">Dancing Script</option>
+            <option value="Pacifico">Pacifico</option>
+            <option value="Righteous">Righteous</option>
+            <option value="Russo One">Russo One</option>
+            <option value="Lilita One">Lilita One</option>
+            <option value="Fredoka One">Fredoka One</option>
+            <option value="Abril Fatface">Abril Fatface</option>
+            <option value="Bebas Neue">Bebas Neue</option>
+            <option value="Permanent Marker">Permanent Marker</option>
+            <option value="Caveat">Caveat</option>
+            <option value="Satisfy">Satisfy</option>
+            <option value="Indie Flower">Indie Flower</option>
+            <option value="Comfortaa">Comfortaa</option>
+          </optgroup>
+          <optgroup label="System">
+            <option value="IBM Plex Sans">IBM Plex Sans</option>
+          </optgroup>
+        </select>
+      </div>
+
+      <div class="ribbon-group">
+        <label>Size</label>
+        <select id="fontSize" onchange="applyFontSize(this.value)">
+          <option value="8">8pt</option>
+          <option value="10">10pt</option>
+          <option value="11" selected>11pt</option>
+          <option value="12">12pt</option>
+          <option value="14">14pt</option>
+          <option value="16">16pt</option>
+          <option value="18">18pt</option>
+          <option value="20">20pt</option>
+          <option value="24">24pt</option>
+          <option value="28">28pt</option>
+          <option value="32">32pt</option>
+          <option value="36">36pt</option>
+          <option value="44">44pt</option>
+          <option value="52">52pt</option>
+          <option value="72">72pt</option>
+        </select>
+      </div>
+
+      <div class="ribbon-group">
+        <button onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+        <button onclick="execCmd('italic')" title="Italic"><i>I</i></button>
+        <button onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+        <button onclick="execCmd('strikeThrough')" title="Strikethrough"><s>S</s></button>
+      </div>
+
+      <div class="ribbon-group">
+        <button onclick="execCmd('justifyLeft')" title="Left">◀</button>
+        <button onclick="execCmd('justifyCenter')" title="Center">▣</button>
+        <button onclick="execCmd('justifyRight')" title="Right">▶</button>
+        <button onclick="execCmd('justifyFull')" title="Justify">▬</button>
+      </div>
+
+      <div class="ribbon-group">
+        <button onclick="execCmd('insertUnorderedList')" title="Bullets">•</button>
+        <button onclick="execCmd('insertOrderedList')" title="Numbers">1.</button>
+      </div>
+
+      <div class="ribbon-group">
+        <div class="color-input-wrapper">
+          <label>Text</label>
+          <input type="color" id="textColor" value="#1b5e20" onchange="execCmd('foreColor', this.value)">
+        </div>
+        <div class="color-input-wrapper">
+          <label>Highlight</label>
+          <input type="color" id="highlightColor" value="#ffff00" onchange="execCmd('hiliteColor', this.value)">
+        </div>
+      </div>
+
+      <div class="ribbon-group">
+        <button onclick="clearFormatting()" title="Clear">Clear</button>
+      </div>
+    </div>
+
+    <!-- MOBILE FORMAT BAR -->
+    <div class="mobile-fmt-bar" id="mobileFmtBar">
+      <button onclick="execCmd('bold')"><b>B</b></button>
+      <button onclick="execCmd('italic')"><i>I</i></button>
+      <button onclick="execCmd('underline')"><u>U</u></button>
+      <button onclick="execCmd('justifyLeft')">◀</button>
+      <button onclick="execCmd('justifyCenter')">▣</button>
+      <button onclick="execCmd('insertUnorderedList')">•</button>
+    </div>
+
+    <!-- WORKSPACE (SCROLLABLE) -->
+    <div class="workspace" id="workspace">
+      <div class="page-wrapper">
+        <div class="page" id="editor" contenteditable="true" spellcheck="false" inputmode="none">
+          <h1 style="color: #7c4dff;">Welcome to OmniWord</h1>
+          <p>This is a professional Microsoft Word replica built with pure HTML, CSS, and JavaScript.</p>
+          <p>Try <b>bold</b>, <i>italic</i>, <u>underlined</u>, or change fonts using the ribbon above.</p>
+          <p>Long-press any word for formatting options (mobile).</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- STATUS BAR -->
+    <div class="statusbar">
+      <span id="pageInfo">Page 1 of 1</span>
+      <span>|</span>
+      <span id="wordCount">0 words</span>
+      <span>|</span>
+      <span id="charCount">0 characters</span>
+      <div class="statusbar-right">
+        <button onclick="zoomOut()">−</button>
+        <span id="zoomLevel">100%</span>
+        <button onclick="zoomIn()">+</button>
+      </div>
+    </div>
+
+    <!-- GBOARD CONTAINER (MOBILE ONLY - FIXED AT BOTTOM) -->
+    <div class="gboard-container" id="gboardContainer" hidden>
+      
+      <!-- Emoji Panel (Persistent) -->
+      <div class="emoji-panel" id="emojiPanel">
+        <div class="emoji-strip">
+          <button class="emoji-tab active" data-cat="smileys">😀</button>
+          <button class="emoji-tab" data-cat="nature">🌿</button>
+          <button class="emoji-tab" data-cat="food">🍕</button>
+          <button class="emoji-tab" data-cat="activity">⚽</button>
+          <button class="emoji-tab" data-cat="travel">✈️</button>
+          <button class="emoji-tab" data-cat="objects">💡</button>
+          <button class="emoji-tab" data-cat="symbols">❤️</button>
+        </div>
+        <div class="emoji-grid" id="emojiGrid"></div>
+      </div>
+
+      <!-- Virtual Keyboard -->
+      <div class="gboard">
+        <!-- ABC LAYER -->
+        <div class="gboard-layer" id="layerABC">
+          <div class="gboard-row">
+            <button class="gkey" data-char="q">q</button>
+            <button class="gkey" data-char="w">w</button>
+            <button class="gkey" data-char="e">e</button>
+            <button class="gkey" data-char="r">r</button>
+            <button class="gkey" data-char="t">t</button>
+            <button class="gkey" data-char="y">y</button>
+            <button class="gkey" data-char="u">u</button>
+            <button class="gkey" data-char="i">i</button>
+            <button class="gkey" data-char="o">o</button>
+            <button class="gkey" data-char="p">p</button>
+          </div>
+          <div class="gboard-row">
+            <button class="gkey" data-char="a">a</button>
+            <button class="gkey" data-char="s">s</button>
+            <button class="gkey" data-char="d">d</button>
+            <button class="gkey" data-char="f">f</button>
+            <button class="gkey" data-char="g">g</button>
+            <button class="gkey" data-char="h">h</button>
+            <button class="gkey" data-char="j">j</button>
+            <button class="gkey" data-char="k">k</button>
+            <button class="gkey" data-char="l">l</button>
+          </div>
+          <div class="gboard-row">
+            <button class="gkey gkey-wide" id="shiftBtn">⇧ shift</button>
+            <button class="gkey" data-char="z">z</button>
+            <button class="gkey" data-char="x">x</button>
+            <button class="gkey" data-char="c">c</button>
+            <button class="gkey" data-char="v">v</button>
+            <button class="gkey" data-char="b">b</button>
+            <button class="gkey" data-char="n">n</button>
+            <button class="gkey" data-char="m">m</button>
+            <button class="gkey gkey-delete" id="backspaceBtn">⌫</button>
+          </div>
+          <div class="gboard-row">
+            <button class="gkey gkey-wide" data-layer="123">?123</button>
+            <button class="gkey" data-char=",">,</button>
+            <button class="gkey gkey-space" data-char=" ">space</button>
+            <button class="gkey" data-char=".">.</button>
+            <button class="gkey gkey-enter">↵</button>
+          </div>
+        </div>
+
+        <!-- 123 LAYER -->
+        <div class="gboard-layer" id="layer123" hidden>
+          <div class="gboard-row">
+            <button class="gkey" data-char="1">1</button>
+            <button class="gkey" data-char="2">2</button>
+            <button class="gkey" data-char="3">3</button>
+            <button class="gkey" data-char="4">4</button>
+            <button class="gkey" data-char="5">5</button>
+            <button class="gkey" data-char="6">6</button>
+            <button class="gkey" data-char="7">7</button>
+            <button class="gkey" data-char="8">8</button>
+            <button class="gkey" data-char="9">9</button>
+            <button class="gkey" data-char="0">0</button>
+          </div>
+          <div class="gboard-row">
+            <button class="gkey" data-char="-">-</button>
+            <button class="gkey" data-char="/">/</button>
+            <button class="gkey" data-char=":">::</button>
+            <button class="gkey" data-char=";">;</button>
+            <button class="gkey" data-char="(">(</button>
+            <button class="gkey" data-char=")">)</button>
+            <button class="gkey" data-char="$">$</button>
+            <button class="gkey" data-char="&">&</button>
+            <button class="gkey" data-char="@">@</button>
+            <button class="gkey" data-char="&quot;">"</button>
+          </div>
+          <div class="gboard-row">
+            <button class="gkey gkey-wide" data-layer="sym">#+==</button>
+            <button class="gkey" data-char=".">.</button>
+            <button class="gkey" data-char=",">,</button>
+            <button class="gkey" data-char="?">?</button>
+            <button class="gkey" data-char="!">!</button>
+            <button class="gkey" data-char="'">'</button>
+            <button class="gkey gkey-delete">⌫</button>
+          </div>
+          <div class="gboard-row">
+            <button class="gkey gkey-wide" data-layer="abc">ABC</button>
+            <button class="gkey gkey-space" data-char=" ">space</button>
+            <button class="gkey gkey-enter">↵</button>
+          </div>
+        </div>
+
+        <!-- SYMBOLS LAYER -->
+        <div class="gboard-layer" id="layerSym" hidden>
+          <div class="gboard-row">
+            <button class="gkey" data-char="[">[</button>
+            <button class="gkey" data-char="]">]</button>
+            <button class="gkey" data-char="{">{</button>
+            <button class="gkey" data-char="}">}</button>
+            <button class="gkey" data-char="#">#</button>
+            <button class="gkey" data-char="%">%</button>
+            <button class="gkey" data-char="^">^</button>
+            <button class="gkey" data-char="*">*</button>
+            <button class="gkey" data-char="+">+</button>
+            <button class="gkey" data-char="=">=</button>
+          </div>
+          <div class="gboard-row">
+            <button class="gkey" data-char="_">_</button>
+            <button class="gkey" data-char="|">|</button>
+            <button class="gkey" data-char="\\">\</button>
+            <button class="gkey" data-char="~">~</button>
+            <button class="gkey" data-char="`">`</button>
+            <button class="gkey" data-char="&lt;">&lt;</button>
+            <button class="gkey" data-char="&gt;">&gt;</button>
+            <button class="gkey" data-char="«">«</button>
+            <button class="gkey" data-char="»">»</button>
+            <button class="gkey" data-char="…">…</button>
+          </div>
+          <div class="gboard-row">
+            <button class="gkey gkey-wide" data-layer="123">123</button>
+            <button class="gkey" data-char=";">;:</button>
+            <button class="gkey" data-char="/">/</button>
+            <button class="gkey" data-char="?">/?"</button>
+            <button class="gkey gkey-delete">⌫</button>
+          </div>
+          <div class="gboard-row">
+            <button class="gkey gkey-wide" data-layer="abc">ABC</button>
+            <button class="gkey gkey-space" data-char=" ">space</button>
+            <button class="gkey gkey-enter">↵</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Language Strip -->
+      <div class="lang-strip">
+        <button class="lang-btn active">English</button>
+        <button class="lang-btn">Español</button>
+        <button class="lang-btn">Français</button>
+        <button class="lang-btn">Deutsch</button>
+        <button class="lang-btn">Italiano</button>
+        <button class="lang-btn">Português</button>
+        <button class="lang-btn">Русский</button>
+        <button class="lang-btn">日本語</button>
+        <button class="lang-btn">中文</button>
+        <button class="lang-btn">한국어</button>
+      </div>
+    </div>
+
+    <!-- CONTEXT MENU -->
+    <div class="ctx-overlay" id="ctxOverlay" onclick="closeContextMenu()"></div>
+    <div class="ctx-menu" id="ctxMenu">
+      <button onclick="execCmd('cut')">✂ Cut</button>
+      <button onclick="execCmd('copy')">📋 Copy</button>
+      <button onclick="execCmd('paste')">📄 Paste</button>
+      <hr>
+      <button onclick="execCmd('bold')"><b>Bold</b></button>
+      <button onclick="execCmd('italic')"><i>Italic</i></button>
+      <button onclick="execCmd('underline')"><u>Underline</u></button>
+      <hr>
+      <button onclick="selectAll()">Select All</button>
+      <button onclick="execCmd('removeFormat')">Clear</button>
+    </div>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
