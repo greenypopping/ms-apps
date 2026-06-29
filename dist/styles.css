@@ -1,0 +1,645 @@
+/* ========================================================
+   OmniWord - Complete Stylesheet
+   Green-Purple Theme | Fixed A4 Layout | Gboard Keyboard
+======================================================== */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --purple: #7c4dff;
+  --purple-dark: #5e35b1;
+  --green-light: #e8f5e9;
+  --green-text: #1b5e20;
+  --green-dark: #0d2818;
+  --green-border: #c8e6c9;
+  --white: #ffffff;
+  --shadow: 0 2px 8px rgba(124,77,255,0.12);
+}
+
+html { height: 100%; background: var(--green-light); }
+
+body {
+  font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
+  background: var(--green-light);
+  color: var(--green-text);
+  height: 100dvh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* MAIN LAYOUT - CRITICAL: Flex column with fixed keyboard at bottom */
+.app-layout {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+/* ========================================================
+   TITLE BAR
+======================================================== */
+.titlebar {
+  background: var(--purple);
+  color: white;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-shrink: 0;
+  box-shadow: var(--shadow);
+  z-index: 100;
+  gap: 12px;
+}
+
+.titlebar-left, .titlebar-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.titlebar-center { font-weight: 600; font-size: 16px; }
+
+.doc-name-input {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.4);
+  color: white;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 13px;
+  max-width: 200px;
+}
+
+.doc-name-input::placeholder { color: rgba(255,255,255,0.7); }
+
+.btn-icon {
+  background: transparent;
+  border: none;
+  color: white;
+  cursor: pointer;
+  font-size: 18px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: background 0.2s;
+}
+
+.btn-icon:hover { background: rgba(255,255,255,0.2); }
+
+/* ========================================================
+   RIBBON TABS
+======================================================== */
+.ribbon-tabs {
+  display: flex;
+  background: white;
+  border-bottom: 1px solid var(--green-border);
+  gap: 0;
+  flex-shrink: 0;
+  z-index: 90;
+  overflow-x: auto;
+}
+
+.ribbon-tab {
+  flex: 1;
+  padding: 8px 12px;
+  background: #f5f5f5;
+  border: none;
+  border-bottom: 3px solid transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--green-text);
+  transition: all 0.2s;
+  min-width: 60px;
+}
+
+.ribbon-tab:hover { background: #efefef; }
+.ribbon-tab.active { background: white; border-bottom-color: var(--purple); color: var(--purple); }
+
+/* ========================================================
+   RIBBON PANEL
+======================================================== */
+.ribbon {
+  background: white;
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  border-bottom: 1px solid var(--green-border);
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.ribbon-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border-right: 1px solid var(--green-border);
+  padding-right: 10px;
+}
+
+.ribbon-group:last-child { border-right: none; }
+
+.ribbon-label { font-size: 11px; font-weight: 600; color: var(--green-text); }
+
+select, input[type="color"] {
+  padding: 4px 6px;
+  border: 1px solid var(--green-border);
+  border-radius: 4px;
+  font-size: 12px;
+  background: white;
+  cursor: pointer;
+}
+
+button {
+  padding: 6px 12px;
+  border: 1px solid transparent;
+  background: transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: background 0.15s;
+  font-size: 13px;
+}
+
+button:hover { background: var(--green-light); }
+button:active { background: var(--green-border); }
+
+.color-input-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.color-input-wrapper input {
+  width: 30px;
+  height: 24px;
+  cursor: pointer;
+}
+
+.color-input-wrapper label {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+/* ========================================================
+   MOBILE FORMAT BAR
+======================================================== */
+.mobile-fmt-bar {
+  display: none;
+  background: white;
+  border-top: 1px solid var(--green-border);
+  border-bottom: 1px solid var(--green-border);
+  padding: 6px;
+  gap: 4px;
+  flex-shrink: 0;
+  overflow-x: auto;
+}
+
+.is-mobile .mobile-fmt-bar { display: flex; }
+
+/* ========================================================
+   WORKSPACE - FLEX 1 TO FILL SPACE
+======================================================== */
+.workspace {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 16px;
+  background: var(--green-light);
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ========================================================
+   PAGE - FIXED A4 SIZE (210mm x 297mm = 794px x 1122px)
+======================================================== */
+.page-wrapper {
+  width: 100%;
+  max-width: 850px;
+  background: white;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.page {
+  /* FIXED A4 DIMENSIONS */
+  width: 100%;
+  height: 1122px;
+  max-height: 1122px;
+  padding: 40px;
+  background: white;
+  font-family: inherit;
+  font-size: 12pt;
+  line-height: 1.6;
+  color: var(--green-text);
+  overflow-y: auto;
+  outline: none;
+  -webkit-touch-callout: none;
+}
+
+.page h1 { margin: 16px 0 12px; font-size: 28pt; color: var(--purple); }
+.page h2 { margin: 14px 0 10px; font-size: 20pt; color: var(--purple); }
+.page h3 { margin: 12px 0 8px; font-size: 16pt; color: var(--purple); }
+.page p { margin: 0 0 12px; }
+.page ul, .page ol { margin: 12px 0; padding-left: 24px; }
+.page li { margin: 6px 0; }
+.page table { border-collapse: collapse; margin: 10px 0; width: 100%; }
+.page table td { border: 1px solid #999; padding: 6px 10px; }
+
+/* ========================================================
+   STATUS BAR
+======================================================== */
+.statusbar {
+  background: var(--purple);
+  color: white;
+  padding: 8px 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 12px;
+  flex-shrink: 0;
+  gap: 12px;
+}
+
+.statusbar-right {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.statusbar-right button {
+  background: rgba(255,255,255,0.2);
+  color: white;
+  border: none;
+  padding: 4px 8px;
+  border-radius: 3px;
+}
+
+.statusbar-right button:hover { background: rgba(255,255,255,0.3); }
+
+/* ========================================================
+   GBOARD CONTAINER - FIXED AT BOTTOM (CRITICAL FIX)
+======================================================== */
+.gboard-container {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--green-light);
+  border-top: 2px solid var(--green-border);
+  display: none;
+  flex-direction: column;
+  z-index: 1000;
+  max-height: 55vh;
+  padding-bottom: env(safe-area-inset-bottom);
+  overflow: hidden;
+}
+
+.is-mobile .gboard-container:not([hidden]) { display: flex; }
+.gboard-container[hidden] { display: none !important; }
+
+/* WORKSPACE PADDING TO AVOID KEYBOARD OVERLAP */
+.is-mobile .workspace {
+  padding-bottom: 400px;
+}
+
+/* ========================================================
+   EMOJI PANEL - PERSISTENT (STAYS VISIBLE)
+======================================================== */
+.emoji-panel {
+  display: flex;
+  flex-direction: column;
+  background: #f5f5f5;
+  border-bottom: 1px solid #e0e0e0;
+  max-height: 180px;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+
+.emoji-strip {
+  display: flex;
+  gap: 0;
+  overflow-x: auto;
+  padding: 4px;
+  border-bottom: 1px solid #e0e0e0;
+  flex-shrink: 0;
+}
+
+.emoji-tab {
+  flex: 0 0 auto;
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border: none;
+  border-bottom: 3px solid transparent;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: border 0.2s;
+}
+
+.emoji-tab.active { border-bottom-color: var(--purple); }
+
+.emoji-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 40px);
+  gap: 4px;
+  padding: 8px;
+  overflow-y: auto;
+  justify-content: center;
+  background: white;
+  flex: 1;
+}
+
+.emoji-btn {
+  width: 40px;
+  height: 40px;
+  background: white;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.emoji-btn:active { background: var(--green-light); }
+
+/* ========================================================
+   VIRTUAL KEYBOARD - GBOARD STYLE
+======================================================== */
+.gboard {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 6px;
+  background: var(--green-light);
+  flex-shrink: 0;
+  overflow-y: auto;
+  max-height: 280px;
+}
+
+.gboard-layer {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.gboard-layer[hidden] { display: none !important; }
+
+.gboard-row {
+  display: flex;
+  gap: 4px;
+  justify-content: center;
+}
+
+.gboard-row-bottom { gap: 6px; }
+
+.gkey {
+  flex: 1;
+  height: 44px;
+  min-width: 32px;
+  max-width: 40px;
+  background: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--green-text);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.1);
+  touch-action: none;
+  user-select: none;
+  cursor: pointer;
+  transition: all 0.05s;
+}
+
+.gkey:active {
+  background: var(--green-border);
+  box-shadow: none;
+  transform: translateY(2px);
+}
+
+.gkey-wide {
+  max-width: 60px;
+  flex: 1.5;
+  background: var(--green-border);
+  font-size: 13px;
+}
+
+.gkey-punct { font-size: 14px; }
+
+.gkey-space {
+  max-width: 200px;
+  flex: 5;
+}
+
+.gkey-delete {
+  background: #ff6b6b;
+  color: white;
+  max-width: 50px;
+}
+
+.gkey-delete:active {
+  background: #ee5a52;
+  box-shadow: none;
+}
+
+.gkey-enter {
+  background: var(--purple);
+  color: white;
+  max-width: 60px;
+}
+
+.gkey-enter:active {
+  background: var(--purple-dark);
+  box-shadow: none;
+}
+
+/* ========================================================
+   LANGUAGE STRIP
+======================================================== */
+.lang-strip {
+  display: flex;
+  gap: 4px;
+  padding: 6px;
+  background: #f9f9f9;
+  border-top: 1px solid #e0e0e0;
+  overflow-x: auto;
+  flex-shrink: 0;
+}
+
+.lang-btn {
+  padding: 6px 10px;
+  background: white;
+  border: 1px solid var(--green-border);
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  white-space: nowrap;
+  flex-shrink: 0;
+  transition: all 0.2s;
+}
+
+.lang-btn:active {
+  background: var(--purple);
+  color: white;
+  border-color: var(--purple);
+}
+
+/* ========================================================
+   CONTEXT MENU
+======================================================== */
+.ctx-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0,0,0,0.3);
+  z-index: 500;
+  display: none;
+}
+
+.ctx-overlay.show { display: block; }
+
+.ctx-menu {
+  position: fixed;
+  background: white;
+  border: 1px solid var(--green-border);
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  z-index: 501;
+  min-width: 150px;
+  display: none;
+}
+
+.ctx-menu.show { display: block; }
+
+.ctx-menu button {
+  width: 100%;
+  text-align: left;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  border-radius: 0;
+}
+
+.ctx-menu button:hover { background: var(--green-light); }
+
+.ctx-menu hr {
+  margin: 4px 0;
+  border: none;
+  border-top: 1px solid #eee;
+}
+
+/* ========================================================
+   DARK MODE
+======================================================== */
+body.dark {
+  background: var(--green-dark);
+  color: #f1f8f6;
+}
+
+body.dark .page {
+  background: var(--green-dark);
+  color: #f1f8f6;
+}
+
+body.dark .ribbon {
+  background: #1b4d2e;
+  border-bottom-color: var(--green-border);
+}
+
+body.dark .ribbon-tabs {
+  background: #1a3d27;
+  border-bottom-color: var(--green-border);
+}
+
+body.dark .ribbon-tab {
+  background: #0d2818;
+  color: #a5d6a7;
+}
+
+body.dark .gboard-container {
+  background: #1b4d2e;
+  border-top-color: var(--green-border);
+}
+
+body.dark .emoji-panel {
+  background: #2d2c2b;
+  border-color: #3d3c3b;
+}
+
+body.dark .emoji-grid {
+  background: #1e1d1c;
+}
+
+body.dark .emoji-btn {
+  background: #3b3a39;
+  border-color: #4d4c4b;
+}
+
+body.dark .gkey {
+  background: #2d7a3a;
+  color: #f1f8f6;
+  box-shadow: 0 2px 0 rgba(0,0,0,0.3);
+}
+
+body.dark .gkey:active { background: #1f5a2b; }
+
+body.dark .gkey-wide { background: #1a4d2e; }
+
+body.dark .gkey-delete { background: #cc3333; }
+body.dark .gkey-delete:active { background: #a82a2a; }
+
+body.dark .gkey-enter { background: #7c4dff; }
+body.dark .gkey-enter:active { background: #5e35b1; }
+
+body.dark .lang-strip { background: #1a1a1a; border-color: #3d3c3b; }
+body.dark .lang-btn { background: #2d2c2b; border-color: #3d3c3b; color: #f3f2f1; }
+
+body.dark .ctx-menu { background: #2d2c2b; border-color: #3d3c3b; }
+body.dark .ctx-menu button { color: #f3f2f1; }
+body.dark .ctx-menu button:hover { background: #3b3a39; }
+
+/* ========================================================
+   MOBILE LAYOUT
+======================================================== */
+@media (max-width: 1024px) {
+  .ribbon { display: none; }
+  .ribbon-tabs { display: none; }
+  .is-mobile { display: block; }
+  
+  .workspace {
+    padding: 12px 8px;
+    /* PADDING BOTTOM FOR KEYBOARD */
+    padding-bottom: 400px;
+  }
+
+  .page-wrapper { max-width: 100%; }
+  .page { font-size: 11pt; padding: 20px; }
+}
+
+/* ========================================================
+   PRINT
+======================================================== */
+@media print {
+  .titlebar, .ribbon-tabs, .ribbon, .mobile-fmt-bar,
+  .statusbar, .gboard-container, .ctx-menu, .ctx-overlay {
+    display: none !important;
+  }
+}
